@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>משב-ארדן מערכות | יומן קבלן חודשי</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+:root{--blue:#2454d6;--blue2:#153a8a;--red:#ff2d2d;--navy:#0f2747;--gold:#d9b44a;--bg:#f3f7fb;--card:#fff;--ink:#10243e;--muted:#64748b;--line:#dbe4ee;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--soft:#eef4ff;--soft2:#f8fafc}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;direction:rtl}
+body{font-family:Arial,"Noto Sans Hebrew",Tahoma,sans-serif;background:linear-gradient(180deg,#eef4fa,#f8fbff 38%,#f3f7fb);color:var(--ink);overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}.hidden{display:none!important}
+.wrap{max-width:1600px;margin:0 auto;padding:22px}
+.topbar{background:linear-gradient(135deg,#fff,#f8fbff);border:1px solid var(--line);box-shadow:0 14px 40px rgba(15,39,71,.08);border-radius:24px;padding:18px 22px;display:grid;grid-template-columns:1.55fr .95fr;gap:18px;align-items:center}
+.brand{display:flex;gap:18px;align-items:center;min-width:0}.brand img{width:310px;max-width:42vw;height:auto;display:block}
+.brand-fallback{font-weight:900;font-size:28px;color:var(--blue);white-space:nowrap}.brand-fallback small{display:block;font-size:13px;letter-spacing:2px;margin-top:2px;color:var(--blue);font-weight:700}
+.brand-title h1{font-size:30px;line-height:1.1;margin-bottom:8px;color:var(--navy)}.brand-title p{font-size:14px;color:var(--muted);line-height:1.6}
+.project-pill{display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--soft);border:1px solid #cbdcff;color:var(--blue2);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800}
+.status-line{font-size:12px;color:var(--muted);margin-top:10px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.meta{background:linear-gradient(135deg,#0f2747,#19406f);color:#fff;border-radius:18px;padding:14px 16px;min-height:76px;display:flex;flex-direction:column;justify-content:center}.meta .k{font-size:12px;color:#cbd5e1;margin-bottom:4px}.meta .v{font-size:20px;font-weight:900}.meta.gold{background:linear-gradient(135deg,#b8860b,#d9b44a);color:#241a00}.meta.gold .k{color:#fff7d6}
+.login-screen{position:fixed;inset:0;z-index:2000;background:linear-gradient(135deg,#0f2747,#19406f);display:flex;align-items:center;justify-content:center;padding:20px}.login-box{background:#fff;width:100%;max-width:430px;border-radius:24px;padding:34px 30px;box-shadow:0 25px 80px rgba(0,0,0,.28)}.login-logo-wrap{text-align:center;margin-bottom:16px}.login-logo-wrap img{width:300px;max-width:100%;height:auto}.login-title{text-align:center;font-size:24px;font-weight:900;color:var(--navy);margin-bottom:6px}.login-sub{text-align:center;color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:24px}.login-error{background:#fee2e2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.field{margin-bottom:12px}.field label{display:block;font-size:12px;color:#475569;font-weight:800;margin-bottom:5px}
+.input{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;color:var(--ink);outline:none;transition:.15s}.input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,84,214,.09)}textarea.input{min-height:88px;resize:vertical;line-height:1.5}
+.btn{border:none;border-radius:999px;padding:11px 18px;font-weight:900;font-size:13px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;justify-content:center;transition:.15s;text-decoration:none;white-space:nowrap}.btn:hover{transform:translateY(-1px)}.btn.primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff}.btn.navy{background:var(--navy);color:#fff}.btn.gold{background:linear-gradient(135deg,#d9b44a,#f3d37a);color:#2f2400}.btn.light{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.danger{background:#fee2e2;color:#991b1b}.btn.ok{background:#dcfce7;color:#166534}.btn.full{width:100%}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px 14px;margin:18px 0;box-shadow:0 8px 22px rgba(15,39,71,.04)}
+.toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.filter-box{display:flex;flex-direction:column;gap:4px}.filter-box label{font-size:11px;font-weight:900;color:var(--muted);padding-right:10px}.select,.search{border:1px solid var(--line);border-radius:999px;background:#f8fafc;padding:10px 14px;outline:none;min-width:170px;font-size:13px;color:var(--ink)}.search{min-width:260px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px;box-shadow:0 8px 20px rgba(15,39,71,.04)}.stat .k{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:8px}.stat .v{font-size:29px;font-weight:900;color:var(--navy);line-height:1}.stat .hint{font-size:12px;color:var(--muted);margin-top:8px}
+.layout{display:grid;grid-template-columns:1.02fr .98fr;gap:18px;align-items:start}.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 28px rgba(15,39,71,.05);overflow:hidden;margin-bottom:18px}.card-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;background:linear-gradient(135deg,#fff,#f8fbff)}.card-head h2{font-size:20px;color:var(--navy)}.card-body{padding:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.form-grid.cols3{grid-template-columns:repeat(3,1fr)}.form-grid.cols4{grid-template-columns:repeat(4,1fr)}.section-title{font-size:14px;color:var(--navy);font-weight:900;padding-bottom:8px;margin:18px 0 12px;border-bottom:2px solid var(--gold)}
+.workers-table,.tasks-table{width:100%;border-collapse:collapse}.workers-table th,.workers-table td,.tasks-table th,.tasks-table td{border:1px solid var(--line);padding:9px;text-align:right;vertical-align:middle;font-size:13px}.workers-table th,.tasks-table th{background:var(--blue);color:#fff;font-weight:900;text-align:center}.workers-table td:nth-child(1),.workers-table td:nth-child(3),.workers-table td:nth-child(4),.workers-table td:nth-child(5),.tasks-table td:nth-child(1),.tasks-table td:nth-child(2),.tasks-table td:nth-child(4),.tasks-table td:nth-child(5),.tasks-table td:nth-child(7){text-align:center}.mini-input{width:100%;border:1px solid transparent;border-radius:8px;padding:7px;background:#fff;outline:none}.mini-input:focus{border-color:var(--blue)}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:15px;display:inline-flex;align-items:center;justify-content:center}.icon-btn:hover{background:#f1f5f9}.divider{height:1px;background:var(--line);margin:16px 0}
+.journal-list{display:grid;gap:12px}.journal-card{border:1px solid var(--line);border-right:6px solid var(--blue);border-radius:20px;background:#fff;overflow:hidden}.journal-card-head{padding:15px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:linear-gradient(135deg,#fff,#fbfdff)}.journal-title{font-size:20px;font-weight:900;color:var(--navy)}.journal-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-top:4px}.journal-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-start;margin-top:10px}.journal-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 15px 15px}.journal-stats div{background:#f8fafc;border:1px solid #edf2f7;border-radius:12px;padding:8px;text-align:center}.journal-stats small{display:block;color:var(--muted);font-size:10px;margin-bottom:3px}.journal-stats b{font-size:12px}
+.days-list{border-top:1px solid var(--line);padding:10px 15px 15px;background:#fbfdff;display:grid;gap:8px}.day-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;cursor:grab}.day-item.drag-over{outline:3px solid var(--gold);background:#fff7d6}.day-date{font-weight:900;color:var(--blue2);text-align:center}.day-text{font-size:12px;color:#334155;line-height:1.5}.day-actions{display:flex;gap:5px;flex-wrap:wrap}.day-actions .btn,.journal-actions .btn{padding:8px 12px;font-size:12px}.drag-handle{cursor:grab;color:var(--blue);font-weight:900;font-size:18px;margin-left:6px}.empty{text-align:center;color:var(--muted);background:#f8fafc;border:1px dashed #cbd5e1;border-radius:18px;padding:28px;line-height:1.8}
+.badge{display:inline-flex;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;background:#eef2ff;color:#3730a3;white-space:nowrap}.badge.ok{background:#dcfce7;color:#166534}.badge.warn{background:#fef3c7;color:#92400e}.badge.bad{background:#fee2e2;color:#991b1b}.badge.local{background:#fff7d6;color:#92400e}
+.toast-wrap{position:fixed;bottom:20px;left:20px;z-index:3000;display:grid;gap:10px}.toast{background:#fff;border-right:5px solid var(--blue);border-radius:14px;box-shadow:0 12px 35px rgba(0,0,0,.16);padding:13px 16px;min-width:280px;max-width:420px;font-size:13px;font-weight:800}.toast.ok{border-color:var(--ok)}.toast.bad{border-color:var(--bad)}.toast.warn{border-color:var(--warn)}
+.modal{position:fixed;inset:0;background:rgba(15,39,71,.58);z-index:1800;display:none;align-items:center;justify-content:center;padding:18px}.modal.active{display:flex}.modal-box{background:#fff;border-radius:22px;width:100%;max-width:980px;max-height:90vh;overflow:auto;box-shadow:0 25px 80px rgba(0,0,0,.28)}.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h2{font-size:21px;color:var(--navy)}.modal-body{padding:20px}.ai-panel{display:grid;gap:12px}.ai-box{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:14px;line-height:1.7;color:var(--ink);font-size:14px}.ai-answer{background:#eef4ff;border-right:4px solid var(--blue);border-radius:16px;padding:14px;line-height:1.7;min-height:80px}
+.print-sheet{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;color:#111}.print-header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--navy);padding-bottom:14px;margin-bottom:14px}.print-header img{width:260px;max-width:42%;height:auto}.print-header h1{font-size:24px;color:#111;text-align:center}.print-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.print-meta div{border:1px solid #111;padding:8px;font-size:12px;min-height:40px}.print-table{width:100%;border-collapse:collapse;margin-top:12px}.print-table th,.print-table td{border:1px solid #111;padding:8px;font-size:12px;text-align:right;vertical-align:top}.print-table th{background:#e8eef6;text-align:center;font-weight:900}.sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px}.sign-box{border-top:2px solid #111;padding-top:8px;text-align:center;font-weight:900}
+
+.journal-card.collapsed .days-list{display:none}
+.journal-name-click{cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.journal-name-click:hover{color:var(--blue)}
+.journal-toggle{font-size:14px;color:var(--blue);font-weight:900}
+.journal-summary{border-top:1px dashed var(--line);background:#fff;padding:10px 15px;display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;line-height:1.6}
+.journal-summary-box{background:#f8fafc;border:1px solid #edf2f7;border-radius:12px;padding:10px}
+.journal-summary-box b{color:var(--navy)}
+.contractor-custom-wrap.hidden{display:none!important}
+.autosave-dot{display:inline-flex;align-items:center;gap:5px}
+.autosave-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(22,163,74,.55)}
+@media(max-width:740px){.journal-summary{grid-template-columns:1fr}}
+
+.journal-card.collapsed .days-list{display:none}
+.journal-name-click{cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.journal-name-click:hover{color:var(--blue)}
+.journal-toggle{font-size:14px;color:var(--blue);font-weight:900}
+.journal-summary{border-top:1px dashed var(--line);background:#fff;padding:10px 15px;display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;line-height:1.6}
+.journal-summary-box{background:#f8fafc;border:1px solid #edf2f7;border-radius:12px;padding:10px}
+.journal-summary-box b{color:var(--navy)}
+.contractor-custom-wrap.hidden{display:none!important}
+.autosave-dot{display:inline-flex;align-items:center;gap:5px}
+.autosave-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(22,163,74,.55)}
+.undo-panel{position:fixed;bottom:20px;right:20px;z-index:3200;display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-right:5px solid var(--gold);border-radius:16px;box-shadow:0 12px 35px rgba(0,0,0,.16);padding:10px 12px;font-size:13px;font-weight:900}
+.undo-panel.hidden{display:none!important}
+@media(max-width:740px){.journal-summary{grid-template-columns:1fr}.undo-panel{left:12px;right:12px;bottom:12px;justify-content:space-between}}
+
+@media(max-width:1100px){.topbar,.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.brand{flex-direction:column;align-items:flex-start}.brand img{max-width:90vw}}
+@media(max-width:740px){.wrap{padding:12px}.form-grid,.form-grid.cols3,.form-grid.cols4,.stats,.meta-grid,.journal-stats,.day-item{grid-template-columns:1fr}.toolbar{align-items:stretch}.toolbar-group{width:100%}.btn,.select,.search{width:100%;min-width:0}.card-body{padding:14px}}
+@media print{body{background:#fff}.login-screen,.toolbar,.stats,.layout,.topbar,.toast-wrap,.modal-head .icon-btn,.modal-head button,.modal-head{display:none!important}.modal{display:block!important;position:static;background:#fff;padding:0}.modal-box{box-shadow:none;border-radius:0;max-height:none;max-width:none}.modal-body{padding:0}.print-sheet{border:none;border-radius:0;padding:0}@page{size:A4 portrait;margin:10mm}}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="undo-panel hidden" id="undoPanel"><span id="undoText">אפשר לבטל פעולה אחרונה</span><button class="btn gold" onclick="undoLastAction()">↩️ בטל</button></div>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <img src="assets/logo-mashav-ardan.png" alt="משב-ארדן מערכות" onerror="this.style.display='none';document.getElementById('loginFallback').classList.remove('hidden')">
+      <div id="loginFallback" class="brand-fallback hidden">משב-ארדן מערכות<small>אנשים בונים הצלחה</small></div>
+    </div>
+    <div class="login-title">יומן קבלן חודשי</div>
+    <div class="login-sub">יומן לפי קבלן וחודש. בתוך כל יומן מוסיפים ימי עבודה, נוכחות עובדים, מיקום, פירוט, כמויות וסדר יום.</div>
+    <div id="loginError" class="login-error hidden"></div>
+    <div class="field"><label>כתובת מייל</label><input class="input" id="loginEmail" type="email" placeholder="Ahmad@mashav-ardan.co.il" value="Ahmad@mashav-ardan.co.il" autocomplete="username"></div>
+    <div class="field"><label>סיסמה</label><input class="input" id="loginPassword" type="password" placeholder="סיסמה משותפת" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()"></div>
+    <button class="btn primary full" onclick="doLogin()" id="loginBtn">🔐 התחבר למערכת</button>
+  </div>
+</div>
+
+<div id="mainApp" class="hidden">
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/logo-mashav-ardan.png" alt="משב-ארדן מערכות" onerror="this.style.display='none';document.getElementById('mainFallback').classList.remove('hidden')">
+        <div id="mainFallback" class="brand-fallback hidden">משב-ארדן מערכות<small>אנשים בונים הצלחה</small></div>
+        <div class="brand-title">
+          <h1>יומן קבלן חודשי | נוכחות ועבודות</h1>
+          <p>פותחים יומן לקבלן לפי חודש, ובתוכו מוסיפים ימי עבודה / תקופה, שמות עובדים, מיקום, פירוט עבודות, כמויות וסדר יום למשימות.</p>
+          <div class="project-pill">🏗️ פרויקט נוכחי: מלון סאן דרומי | מס׳ 23466</div>
+          <div class="status-line" id="syncStatus">☁️ ממתין להתחברות...</div>
+        </div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta"><div class="k">תאריך ושעה</div><div class="v" id="clock">--:--</div></div>
+        <div class="meta gold"><div class="k">משתמש</div><div class="v" id="userEmail">מקומי</div></div>
+        <div class="meta"><div class="k">חודש פעיל</div><div class="v" id="activeMonthMeta">כללי</div></div>
+        <div class="meta"><div class="k">מצב שמירה</div><div class="v" id="storageMode">מקומי</div></div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <div class="filter-box"><label>פרויקט</label><select class="select" id="projectFilter" onchange="renderAll()"></select></div>
+        <div class="filter-box"><label>מחודש</label><input class="select" type="month" id="monthFrom" onchange="syncMonthPreset(); renderAll()"></div>
+        <div class="filter-box"><label>עד חודש</label><input class="select" type="month" id="monthTo" onchange="syncMonthPreset(); renderAll()"></div>
+        <div class="filter-box"><label>טווח</label><select class="select" id="monthPreset" onchange="setMonthPreset(this.value)"><option value="month">חודשים</option><option value="year">שנה שלמה</option><option value="all">כל השנים</option></select></div>
+        <div class="filter-box"><label>קבלן</label><select class="select" id="contractorFilter" onchange="renderAll()"></select></div>
+        <button class="btn light" onclick="openContractorManager()">ניהול קבלנים</button>
+        <div class="filter-box"><label>סדר</label><select class="select" id="sortMode" onchange="renderAll()"><option value="manual">סדר ידני — גרירה</option><option value="date_asc">תאריך ישן קודם</option><option value="date_desc">תאריך חדש קודם</option><option value="contractor">לפי קבלן</option></select></div>
+        <div class="filter-box"><label>חיפוש</label><input class="search" id="searchInput" placeholder="קבלן / מיקום / פועל / עבודה..." oninput="renderAll()"></div>
+      </div>
+      <div class="toolbar-group">
+        <button class="btn light" onclick="resetForm()">+ יום עבודה חדש</button>
+        <button class="btn gold" onclick="exportExcel()">Excel לפי הסינון</button>
+        <button class="btn gold" onclick="exportAllContractors()">Excel כללי לכל הקבלנים</button>
+        <button class="btn light" onclick="openAIModal()">🤖 AI</button>
+        <button class="btn navy" onclick="printSelectedOrBlank()">הדפסה</button>
+        <button class="btn danger" onclick="logout()">יציאה</button>
+      </div>
+    </div>
+
+    <section class="stats">
+      <div class="stat"><div class="k">יומנים חודשיים</div><div class="v" id="statJournals">0</div><div class="hint">קבלן + חודש + פרויקט</div></div>
+      <div class="stat"><div class="k">ימי עבודה</div><div class="v" id="statLogs">0</div><div class="hint">לפי הסינון</div></div>
+      <div class="stat"><div class="k">סה״כ הופעות פועלים</div><div class="v" id="statWorkers">0</div><div class="hint">סיכום שמות עובדים</div></div>
+      <div class="stat"><div class="k">עלות משוערת</div><div class="v" id="statAmount">₪0</div><div class="hint">לפי תעריף אם הוזן</div></div>
+    </section>
+
+    <main class="layout">
+      <section class="card">
+        <div class="card-head">
+          <h2>יומנים חודשיים לפי קבלן</h2>
+          <span class="badge local">אין טבלת אקסל באתר — רק יומנים מסודרים</span>
+        </div>
+        <div class="card-body">
+          <div id="journalList" class="journal-list"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2 id="formTitle">הוספת יום עבודה ליומן</h2>
+          <span class="badge" id="editingBadge">טיוטה</span>
+        </div>
+        <div class="card-body">
+          <div class="form-grid cols3">
+            <div class="field"><label>תאריך יום עבודה</label><input class="input" type="date" id="logDate" onchange="updateDayName()"></div>
+            <div class="field"><label>יום</label><input class="input" id="dayName" placeholder="ראשון / שני..."></div>
+            <div class="field"><label>חודש היומן</label><input class="input" type="month" id="monthKey"></div>
+            <div class="field"><label>מס׳ פרויקט</label><input class="input" id="projectNumber" value="23466"></div>
+            <div class="field"><label>שם פרויקט</label><input class="input" id="projectName" value="מלון סאן דרומי"></div>
+            <div class="field">
+              <label>שם הקבלן / חברה</label>
+              <select class="input" id="contractorSelect" onchange="handleContractorSelect(); autoSaveFromForm()">
+                <option value="ויסאם">ויסאם</option>
+                <option value="אחר">אחר / הוספה ידנית</option>
+              </select>
+            </div>
+            <div class="field contractor-custom-wrap hidden" id="contractorCustomWrap">
+              <label>שם קבלן חדש / ידני</label>
+              <input class="input" id="contractorName" placeholder="הקלד שם קבלן חדש" oninput="autoSaveFromForm()">
+            </div>
+            <div class="field"><label>מנהל עבודה מטעם הקבלן</label><input class="input" id="contractorManager" placeholder="שם איש קשר"></div>
+            <div class="field"><label>טלפון</label><input class="input" id="contractorPhone" placeholder="05X-XXXXXXX"></div>
+          </div>
+
+          <div class="section-title">מיקום העבודה</div>
+          <div class="form-grid cols4">
+            <div class="field"><label>מגדל / אגף</label><select class="input" id="tower"><option>דרומי</option><option>צפוני</option><option>מרכזי</option><option>חניון</option><option>אחר</option></select></div>
+            <div class="field"><label>קומה</label><input class="input" id="floor" placeholder="27 / לובי / 1-3"></div>
+            <div class="field"><label>אזור</label><input class="input" id="area" placeholder="אולם / חדר כושר / לובי"></div>
+            <div class="field"><label>חדר / הערת מיקום</label><input class="input" id="room" placeholder="מס׳ חדר / פיר / חדר חשמל"></div>
+          </div>
+
+          <div class="section-title">נוכחות עובדים</div>
+          <table class="workers-table">
+            <thead><tr><th style="width:55px">מס׳</th><th>שם הפועל</th><th style="width:120px">תפקיד</th><th style="width:80px">הגיע?</th><th style="width:70px">מחיקה</th></tr></thead>
+            <tbody id="workersBody"></tbody>
+          </table>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn light" onclick="addWorkerRow()">+ הוסף פועל</button>
+            <button class="btn light" onclick="addManyWorkers()">הוסף כמה שמות</button>
+            <span class="badge">כמות פועלים: <span id="workersCount">0</span></span>
+          </div>
+
+          <div class="section-title">פירוט עבודה</div>
+          <div class="form-grid">
+            <div class="field"><label>מה היה צריך לעשות?</label><textarea class="input" id="plannedWork" placeholder="משימות שתוכננו לאותו יום..."></textarea></div>
+            <div class="field"><label>מה בוצע בפועל?</label><textarea class="input" id="doneWork" placeholder="פירוט העבודה שבוצעה בפועל..."></textarea></div>
+            <div class="field"><label>כמויות / דגשים לחשבון</label><textarea class="input" id="quantities" placeholder="כמויות, כבלים, גופים, נקודות, דגשים..."></textarea></div>
+            <div class="field"><label>הערות / חריגים / ליקויים</label><textarea class="input" id="notes" placeholder="עיכובים, חוסר ציוד, בעיות בטיחות, עבודה חלקית..."></textarea></div>
+            <div class="field"><label>הנחיות להמשך</label><textarea class="input" id="nextTasks" placeholder="מה צריך להשלים מחר / שבוע הבא..."></textarea></div>
+          </div>
+
+          <div class="section-title">סדר יום לקבלן — משימות ועדיפויות</div>
+          <table class="tasks-table">
+            <thead><tr><th style="width:45px">מס׳</th><th style="width:110px">עדיפות</th><th>משימה</th><th style="width:120px">סטטוס</th><th style="width:120px">תאריך יעד</th><th>הערה</th><th style="width:70px">מחיקה</th></tr></thead>
+            <tbody id="tasksBody"></tbody>
+          </table>
+          <div style="margin-top:10px"><button class="btn light" onclick="addTaskRow()">+ הוסף משימה לסדר יום</button></div>
+
+          <div class="section-title">שעות ותשלום</div>
+          <div class="form-grid cols4">
+            <div class="field"><label>שעת התחלה</label><input class="input" type="time" id="startTime" onchange="calcHours()"></div>
+            <div class="field"><label>שעת סיום</label><input class="input" type="time" id="endTime" onchange="calcHours()"></div>
+            <div class="field"><label>הפסקה בדקות</label><input class="input" type="number" id="breakMinutes" value="0" min="0" onchange="calcHours()"></div>
+            <div class="field"><label>שעות מאושרות</label><input class="input" type="number" id="approvedHours" step="0.25" value="0" onchange="calcAmount()"></div>
+            <div class="field"><label>סוג תשלום</label><select class="input" id="paymentType" onchange="calcAmount()"><option>לפי שעות</option><option>יומי</option><option>קומפלט</option><option>לא לתשלום עדיין</option></select></div>
+            <div class="field"><label>תעריף</label><input class="input" type="number" id="rate" step="0.01" placeholder="₪" onchange="calcAmount()"></div>
+            <div class="field"><label>סכום משוער</label><input class="input" type="number" id="amount" step="0.01" placeholder="₪"></div>
+            <div class="field"><label>סטטוס</label><select class="input" id="status"><option>טיוטה</option><option>בוצע לפי דיווח</option><option>ממתין לאישור</option><option>מאושר לתשלום</option><option>נדחה / דורש תיקון</option></select></div>
+          </div>
+
+          <div class="form-grid cols3">
+            <div class="field"><label>מנהל עבודה / מאשר</label><input class="input" id="supervisorName" value="אחמד ח׳אליל"></div>
+            <div class="field"><label>תפקיד</label><input class="input" id="supervisorRole" value="מהנדס טכני - מנהל עבודה"></div>
+            <div class="field"><label>חתימה / אישור</label><input class="input" id="approvalNote" placeholder="מאושר / לא מאושר / הערה"></div>
+          </div>
+
+          <div class="divider"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start">
+            <button class="btn primary" onclick="saveLog()">💾 שמור יום עבודה</button>
+            <button class="btn gold" onclick="saveAndNew()">💾 שמור והוסף קבלן/יום נוסף</button>
+            
+            <button class="btn ok" onclick="approveCurrent()">✅ אשר לתשלום</button>
+            
+            <button class="btn light" onclick="openPrintPreview()">תצוגת הדפסה</button>
+            <button class="btn danger" onclick="deleteCurrent()">מחיקה</button>
+            <span class="badge autosave-dot" id="autoSaveStatus">שמירה אוטומטית פעילה</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+
+<div class="modal" id="contractorModal" onclick="closeContractorManager(event)">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:760px">
+    <div class="modal-head">
+      <h2>ניהול קבלנים</h2>
+      <button class="icon-btn" onclick="closeContractorManager(true)">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="ai-box">
+        כאן אפשר לתקן שם קבלן בכל היומנים שלו, או למחוק שם מרשימת הבחירה בלבד.
+        מחיקה מרשימת הבחירה לא מוחקת יומן ולא מוחקת ימי עבודה.
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>בחר קבלן קיים</label><select class="input" id="contractorManageSelect" onchange="fillRenameContractor()"></select></div>
+        <div class="field"><label>שם חדש לתיקון</label><input class="input" id="contractorRenameInput" placeholder="שם קבלן מתוקן"></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px">
+        <button class="btn primary" onclick="renameContractorEverywhere()">שמור תיקון שם בכל היומנים</button>
+        <button class="btn danger" onclick="hideContractorFromMemory()">הסר מרשימת הבחירה בלבד</button>
+        <button class="btn light" onclick="undoLastAction()">↩️ חזור פעולה</button>
+      </div>
+      <div class="section-title">קבלנים שהוסרו מהרשימה</div>
+      <div class="form-grid">
+        <div class="field"><label>שם שהוסר</label><select class="input" id="hiddenContractorSelect"></select></div>
+        <div class="field" style="display:flex;align-items:end"><button class="btn ok full" onclick="restoreContractorToMemory()">החזר לרשימת הבחירה</button></div>
+      </div>
+      <div class="ai-answer" id="contractorManageInfo">מוכן.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="aiModal" onclick="closeAIModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:760px">
+    <div class="modal-head"><h2>🤖 עוזר AI — יומן קבלן</h2><button class="icon-btn" onclick="closeAIModal(true)">✕</button></div>
+    <div class="modal-body">
+      <div class="ai-panel">
+        <div class="ai-box">AI מקומי לסיכום היומנים, משימות וסכומים לפי הסינון. בהמשך אפשר לחבר ל־API אמיתי.</div>
+        <textarea class="input" id="aiPrompt" placeholder="לדוגמה: מי ממתין לאישור? מה צריך לשלם לקבלן? מה המשימות בעדיפות גבוהה?"></textarea>
+        <button class="btn primary" onclick="askAI()">קבל סיכום</button>
+        <div class="ai-answer" id="aiAnswer">מוכן.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="printModal" onclick="closePrint(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head"><h2>תצוגת הדפסה / PDF</h2><div style="display:flex;gap:8px"><button class="btn navy" onclick="window.print()">הדפס / שמור PDF</button><button class="icon-btn" onclick="closePrint(true)">✕</button></div></div>
+    <div class="modal-body" id="printBody"></div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_LOGIN_EMAIL='Ahmad@mashav-ardan.co.il';
+const ALLOWED_EMAIL_DOMAIN='@mashav-ardan.co.il';
+const SHARED_LOGIN_PASSWORD='1234567890';
+const SUPABASE_URL='https://hcmmtmfzdgzdisobvpav.supabase.co';
+const SUPABASE_KEY='sb_publishable_lQ62NRLxF8pST3qNF1Pqzw_ba-WQIwt';
+const TABLE_NAME='contractor_daily_logs';
+const LOCAL_KEY='mashav_ardan_contractor_logs_v5_jan';
+const PROJECTS_KEY='mashav_ardan_projects_v4';
+const UNDO_KEY='mashav_ardan_undo_stack_v4';
+const CONTRACTOR_MEMORY_KEY='mashav_ardan_contractor_memory_v4';
+const LOGO_DATA_URI='data:image/png;base64,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';
+const DEFAULT_LOGS=[{"id": "jan2026-2026-01-01-1", "created_at": "2026-07-09T05:05:01.154730", "updated_at": "2026-07-09T05:05:01.154735", "sort_order": 1, "log_date": "2026-01-01", "day_name": "חמישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "הגשה, חדר אוכל, תעלות/פסים", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "התקנת ספוטים; הרכבת פסים; התקנת גופי תאורה על הפס; חיבור גופי תאורה לשאפת/וונטה; החלפת שנאים/דרייברים תקולים; השלמת תאורה באזור ההגשה וחדר האוכל; התקנת תאורה על השנדלרים.", "quantities": "13 ספוטים; 14 גופי תאורה על פס; 3 גופי תאורה לשאפת/וונטה; 5 שנאים/דרייברים במעגלים 5-6.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-04-2", "created_at": "2026-07-09T05:05:01.154750", "updated_at": "2026-07-09T05:05:01.154751", "sort_order": 2, "log_date": "2026-01-04", "day_name": "ראשון", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "מטבח, לובי מעלית חניון -1/-2, סקיילייט, לאונג׳ בר", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "התקנות חירום במטבח; השחלת הזנות חדשות לתעלות; עבודות לובי מעלית חניון; עבודה בסקיילייט כולל התקנת הפס הראשון והכנות/חורים לרילייסים גדולים; הוספת נקודות תאורה בלאונג׳ בר ונקודת תאורה למפוח ללוח.", "quantities": "2 הזנות 5x2.5; בלובי: 10 נקודות תאורה + 2 חירום + 12 נקודות התקנה; בלאונג׳ בר: 7 נקודות תאורה + נקודה לתאורת מפוח ללוח.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-05-3", "created_at": "2026-07-09T05:05:01.154761", "updated_at": "2026-07-09T05:05:01.154762", "sort_order": 3, "log_date": "2026-01-05", "day_name": "שני", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "מטבח, חדר VIP, לאונג׳ בר, חדר אוכל, מעלית מטבח", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "התקנת גופי תאורה וחירום; חיבור תאורות מטבח; בחדר VIP העברת תאורה נסתרת מפתח שירות מבוטל אל גופי התאורה הנסתרת; בידוד כבלי תאורה בלאונג׳ בר; ביטול וחיבור מערכות וילונות בחדר אוכל; התקנות פקטים והארקה ליד הלוח; התקנת שקעים חיצוניים בחדר ליד מעלית המטבח.", "quantities": "11 גופים; 2 חירום; חדר VIP: 2 נקודות תאורה + 2 נקודות DALI + 2 התקנות; 2 פקטים 80A במטבח; 2 פקטים למעליות; פס הארקה.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-06-4", "created_at": "2026-07-09T05:05:01.154769", "updated_at": "2026-07-09T05:05:01.154770", "sort_order": 4, "log_date": "2026-01-06", "day_name": "שלישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "מטבח, חדר אוכל, לובי מעליות נוסעים", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "תשתית כוח חיצונית במטבח בצנרת ברזל; השחלת הזנות תלת־פאזיות; חיבור תאורה זמנית ללוח זמני במטבח; המשך חיבור וילונות בחדר אוכל; הוספת נקודת חירום; שינוי תשתית תאורה בלובי מעליות נוסעים ופתיחת חורים בגבס.", "quantities": "2 הזנות תלת־פאזיות; 2 תאורות זמניות; 2 לובי מעליות. בכל לובי: 8 תאורה נסתרת + 2 ספוטים + 10 DALI + 4 חירום + 1 יציאה; 6 חורים בגבס.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-07-5", "created_at": "2026-07-09T05:05:01.154778", "updated_at": "2026-07-09T05:05:01.154779", "sort_order": 5, "log_date": "2026-01-07", "day_name": "רביעי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "לובי מעליות נוסעים, לאונג׳ בר, אולם", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "המשך שינוי תשתית תאורה בלובי מעליות נוסעים; השחלת הזנות DALI חסרות; הוספת נקודת תאורה בלאונג׳ בר מעל עמדות DJ; חיבור הזנות שנדלירים חדשים בלוח; המשך תעלות תקשורת באולם.", "quantities": "2 לובי מעליות. בכל לובי: 8 נסתרת + 2 ספוטים + 10 DALI + 4 חירום + 1 יציאה; 6 חורים בגבס; נקודת תאורה מעל DJ.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-08-6", "created_at": "2026-07-09T05:05:01.154785", "updated_at": "2026-07-09T05:05:01.154786", "sort_order": 6, "log_date": "2026-01-08", "day_name": "חמישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "אולם, מדרגות ברזל, מטבח, מרפסת לאונג׳ בר", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "הכנת נקודות מזגנים לחדרי האולם כולל הזנות ללוח והזנות DALI; ביצוע הארקה למדרגות ברזל; התקנת שלטי יציאה במטבח; השחלת נקודות וילון באולם; תשתית נקודות כוח במרפסת הלאונג׳ בר.", "quantities": "2 נקודות מזגנים; הארקה 25 ממ״ר; 16 נקודות וילון; 6 נקודות כוח.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-11-7", "created_at": "2026-07-09T05:05:01.154793", "updated_at": "2026-07-09T05:05:01.154794", "sort_order": 7, "log_date": "2026-01-11", "day_name": "ראשון", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "מטבח, גג/שטח גג, נישת תקשורת, פרוזדור שירותים, אולם", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "השחלת כבלים מהמטבח לגג; התקנת שקעים ליד מקרר; הדבקה והארכת צנרת ברזל; ביצוע נקודות UPS בנישת תקשורת; הארכת כבלים בפרוזדור שירותי האולם אל הלוח; תשתית ללחצנים/מגנטים של דלתות כולל פתיחה בגבס ובניצבים; המשך שקעי וילונות באולם; התקנת וחיבור שלטי יציאה מעל דלתות.", "quantities": "2 כבלים לגג; 2 שקעים ליד מקרר; 2 נקודות UPS; 5 לחצנים/מגנטים; 16 נקודות וילון; 3 שלטי יציאה.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-12-8", "created_at": "2026-07-09T05:05:01.154800", "updated_at": "2026-07-09T05:05:01.154801", "sort_order": 8, "log_date": "2026-01-12", "day_name": "שני", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "מטבח, גלריה, הגשה, חדר אוכל, משרדים, לובי, אולם", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "התקנת פקטים למעלית במטבח; השחלת צינור וכבל מהווסת בגלריה לפקט בהגשה; השחלת כבל פיקוד מלוח חדר אוכל ללוח משרדים דרך תקרות סגורות; התקנת שלטי יציאה בלובי ופתיחת גבס; זיהוי כבלי תאורה וחירום ישנים באולם; בדיקות ופירוק כבלים חתוכים מהרשת; בדיקת גופי חירום ושלטי יציאה.", "quantities": "כבל 3x2.5; כבל פיקוד; רוב גופי החירום נמצאו לא תקינים לפי הדיווח.", "notes": "נדרש מעקב על גופי חירום שלא עובדים.", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-14-9", "created_at": "2026-07-09T05:05:01.154808", "updated_at": "2026-07-09T05:05:01.154809", "sort_order": 9, "log_date": "2026-01-14", "day_name": "רביעי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "שירותים, לאונג׳ בר, אולם, מטבח, לובי נוסעים, מסעדה, מקלט", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "התקנת שקעים לברזים ומשתנות בשירותים; השחלת כבל לנישת גילוי אש מלוח לאונג׳ בר; השחלת כבל פיקוד מלוח לאונג׳ בר ללוח האולם; השחלת שרשור מהפתח ללוח; התקנת שקעי CEE בנישת תקשורת במטבח; הדבקת תאורה נסתרת בלובי נוסעים; זיהוי וחיבור כבלי תאורה בלוח; התקנת לוחות/אביזרי וולטאר במטבח; התקנת תאורה בלובי מסעדה בקומות חניון.", "quantities": "18 שקעים; כבל 3x2.5; שרשור 50 מ״מ; 5 לוחות/אביזרי וולטאר; 6 התקנות × 3 לובאים בקומות -1/-2.", "notes": "המונח 'וולטאר' לא ודאי — להשאיר לבדיקה אם צריך חשבון כמויות מדויק.", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-15-10", "created_at": "2026-07-09T05:05:01.154816", "updated_at": "2026-07-09T05:05:01.154817", "sort_order": 10, "log_date": "2026-01-15", "day_name": "חמישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "חדרי רחצה, מעבר חדרי רחצה, לובי מעליות, מעבר חדר אוכל", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}, {"name": "אבו אלסקר", "role": "", "present": true}], "planned_work": "", "done_work": "התקנת ספוטים בחדרי רחצה; התקנת גופי חירום ושלטי יציאה; התקנת שקע מזגן; התקנת תאורה במעבר חדרי רחצה על מגשים; התקנת שלטי יציאה לפי גרמושקה בלובי מעליות ובמעבר חדר אוכל.", "quantities": "27 ספוטים; 2 חירום; 3 שלטי יציאה; שקע מזגן; במעבר: 4 תאורות + 2 חירום + 1 יציאה; לפי גרמושקה: 4 נקודות + 4 התקנות.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-18-11", "created_at": "2026-07-09T05:05:01.154822", "updated_at": "2026-07-09T05:05:01.154823", "sort_order": 11, "log_date": "2026-01-18", "day_name": "ראשון", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "כניסה/דלת מבוקרת, נישת לוח, רכזת גז, ליד שירותי מטבח, מעל מדיח, לובי כניסה, פילאטיס", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "עבודת דלת מבוקרת בכניסה/דלת שנייה; סידור כבלי הזנות האולם לתוך נישת הלוח; נקודת חשמל וגילוי אש לנישת רכזת גז; התקנת שלט יציאה על מגנט לדלת ליד שירותי מטבח; השחלת הזנת מזגן מעל המדיח; עבודות בדלתות לובי כניסה; עבודה באזור פילאטיס — הדבקת תאורה נסתרת.", "quantities": "כבל 3x2.5 למזגן מעל המדיח; שלט יציאה מגנטי.", "notes": "ניסוח 'כניסה/דלת שנייה' נוקה לפי ההודעה המקורית, אך שם האזור לא ברור לגמרי.", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-19-12", "created_at": "2026-07-09T05:05:01.154829", "updated_at": "2026-07-09T05:05:01.154830", "sort_order": 12, "log_date": "2026-01-19", "day_name": "שני", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "פילאטיס, פרוזדור, לוח חשמל", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "השלמת עבודות פילאטיס: תאורה נסתרת, נקודות לדרייברים וחיבורם; הוספת ספוטים ומפסקים; הוספת שלטי יציאה; הוספת תאורה נסתרת למראה על עמוד; הוספת שקעי מזגן; השחלת הזנות מזגנים ותאורה ללוח; חיבור הזנות פילאטיס; השלמת תעלה בפרוזדור עד הסוף.", "quantities": "38 מטר תאורה נסתרת; 3 נקודות דרייבר; 2 ספוטים; 2 שלטי יציאה; 2 שקעי מזגן; 7 הזנות מזגנים; 2 הזנות תאורה.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-20-13", "created_at": "2026-07-09T05:05:01.154837", "updated_at": "2026-07-09T05:05:01.154837", "sort_order": 13, "log_date": "2026-01-20", "day_name": "שלישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "ספא, סאונה, מטבח", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "עבודות בספא לפי תכנית חדשה: הוספה וביטול נקודות תאורה ו-DALI; הוספת שקעים לקולר עם הזנות; הוספת תשתית והזנה לסאונה; במטבח ביצוע שקעי יתושים/איטושים; התקנת פקטים בכניסה; השחלת הזנות לשקעים במרכז; הוספת הזנה מהפקט ללוח.", "quantities": "2 שקעים לקולר; הזנה 5x2.5 לסאונה; 4 פקטים בכניסה; 8 הזנות לשקעים; הזנה 5x16 מהפקט ללוח.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-21-14", "created_at": "2026-07-09T05:05:01.154843", "updated_at": "2026-07-09T05:05:01.154844", "sort_order": 14, "log_date": "2026-01-21", "day_name": "רביעי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "אזור בריכה, Green Disc ישן, לוח זמני, מטבח, מנדף, תעלות, שירותים", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "תחילת תשתית תאורה סביב הבריכה; טיפול בכבלים עם מתח ב-Green Disc הישן — ביטול ובידוד; הוספת לוח חשמל זמני; במטבח הוספת שקעים ליד מנדף; השחלת כבל נאופרן מהמנדף לפקטים והזנה מהפקטים ללוח; הוצאת כבל הזנה מהתעלה שהיה מיועד למזגן; הרמת כבל נאופרן לגובה תקני יותר; השחלת הארקות לפקטים; תאורה נסתרת בשירותים ונקודות חדשות לנסתרת.", "quantities": "15 נקודות תאורה סביב בריכה; 2 כבלים Green Disc בוטלו ובודדו; לוח זמני 25A; 2 שקעים ליד מנדף; כבל 5x2.5 נאופרן; כבל 5x16; הרמת כבל מ-7 ס״מ ל-250 ס״מ; 3 הארקות 16 ממ״ר לפקטים 125A.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-25-15", "created_at": "2026-07-09T05:05:01.154850", "updated_at": "2026-07-09T05:05:01.154851", "sort_order": 15, "log_date": "2026-01-25", "day_name": "ראשון", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "לוח זמני, פקטים, שירותים", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "אבו אלסקר", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "פירוק לוח זמני ישן והתקנת לוח זמני חדש; השחלת הזנה בכבל 5x6 וחיבור בלוח; חיווט וחיבור הארקות בתוך הפקטים; התקנת פקט חדש לכבל 5x2.5 וחיווט וחיבור; המשך תאורה נסתרת בשירותים ונקודות חדשות לתאורה נסתרת.", "quantities": "לוח זמני חדש; כבל 5x6; כבל 5x2.5; פקט חדש; חיבורי הארקות.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-26-16", "created_at": "2026-07-09T05:05:01.154858", "updated_at": "2026-07-09T05:05:01.154859", "sort_order": 16, "log_date": "2026-01-26", "day_name": "שני", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "סוויטה נשיאותית, חדרי רחצה קומה -2, אולם/מטבח, בריכה -2, חדר מנוחה ופרוזדור שירות", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "אבו אלסקר", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "עבודות ושינויים בסוויטה נשיאותית; תאורת חדרי רחצה בקומה -2 כולל השחלת כבל וחיבור ללוח הזמני; העברת הלוח הזמני של האולם והמטבח לחדר פנימי כולל פירוק, חיבור, הארכת הזנה וחיבור הארקות בלוח בקומה -1; השחלת רמקולים באזור הבריכה בקומה -2; השחלת שרשורים מחדר מנוחה לבית שירות / פתח שירות בפרוזדור.", "quantities": "3 רמקולים; 2 שרשורים 50 מ״מ; הארכת הזנה וחיבורי הארקה בלוח.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-27-17", "created_at": "2026-07-09T05:05:01.154864", "updated_at": "2026-07-09T05:05:01.154865", "sort_order": 17, "log_date": "2026-01-27", "day_name": "שלישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "סוויטה נשיאותית, סקיילייט, לובי מסעדה, לובי מעליות, בית כנסת/פרוזדור", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "עבודות בסוויטה נשיאותית; חיבור והתקנת גופי תאורה בסקיילייט והפעלתם; תאורת לובי מסעדה בקומה -1; חיבור והפעלת לובי מעלית מסעדה צפוני בקומה -2; סידור/צמצום והשחלת הזנות לובי מעליות מסעדה ונוסעים מלוח בית הכנסת ללוח הפרוזדור.", "quantities": "תאורת לובי מסעדה: 2 אזורים/נקודות לפי הדיווח; חיבור גופי סקיילייט; השחלת הזנות בין לוחות.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-28-18", "created_at": "2026-07-09T05:05:01.154872", "updated_at": "2026-07-09T05:05:01.154873", "sort_order": 18, "log_date": "2026-01-28", "day_name": "רביעי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "סוויטה נשיאותית, שירותי בריכה -1, לוחות מעליות, גלריה צפון, מעלית משרדים", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "תאמר", "role": "", "present": true}, {"name": "אבו אלסקר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "עבודות בסוויטה נשיאותית; תשתית תאורה בשירותי בריכה בקומה -1; זיהוי וחיבור כבלי מעליות בלוחות; הוספת מפסקים בלוחות; זיהוי כבלי מזגנים בגלריה צפון; השחלת הארקות למעלית משרדים מקומה -2 לפס הארקה.", "quantities": "מעליות: 2 מעליות חתן/כלה + מעלית מטבח האולם + מעלית משרדים; 2 הארקות למעלית משרדים לפס הארקה.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}, {"id": "jan2026-2026-01-29-19", "created_at": "2026-07-09T05:05:01.154878", "updated_at": "2026-07-09T05:05:01.154879", "sort_order": 19, "log_date": "2026-01-29", "day_name": "חמישי", "month_key": "2026-01", "project_number": "23466", "project_name": "מלון סאן דרומי", "contractor_name": "ויסאם", "contractor_manager": "", "contractor_phone": "", "tower": "דרומי", "floor": "", "area": "סוויטה נשיאותית, אולם, חדר כושר, גלריה, לוח מזגנים", "room": "", "workers": [{"name": "ויסאם", "role": "", "present": true}, {"name": "אבו פאיז", "role": "", "present": true}, {"name": "אבו אלסקר", "role": "", "present": true}, {"name": "נסר", "role": "", "present": true}], "planned_work": "", "done_work": "עבודות בסוויטה נשיאותית; התקנת גופי חירום באולם לאחר חשמול ובדיקת גופים שרופים; השחלת כבל הזנה מלוח חדר כושר ללוח מזגנים בגלריה כולל הארקה וחיבור בשני הצדדים.", "quantities": "כבל 95 ממ״ר; הארקה 50 ממ״ר; חיבור בלוח חדר כושר ובצד לוח המזגנים בגלריה.", "notes": "", "next_tasks": "", "tasks": [], "start_time": "", "end_time": "", "break_minutes": 0, "approved_hours": 0, "payment_type": "לפי שעות", "rate": 0, "amount": 0, "status": "בוצע לפי דיווח", "supervisor_name": "אחמד ח׳אליל", "supervisor_role": "מהנדס טכני - מנהל עבודה", "approval_note": "", "user_email": ""}];
+let accessToken=null,currentUser=null,storageMode='local',logs=[],editingId=null,draggedLogId=null;let undoStack=[];let expandedJournals=new Set();
+let projects=[{number:'23466',name:'מלון סאן דרומי'},{number:'23466-N',name:'מלון סאן צפוני'}];
+let contractorMemory={custom:['ויסאם'],hidden:[]};
+
+function $(id){return document.getElementById(id)}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function todayISO(){return new Date().toISOString().slice(0,10)}
+function currentMonth(){return todayISO().slice(0,7)}
+function money(n){return '₪'+Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}
+function uid(){return crypto.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
+function toast(msg,type='ok'){const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;$('toastWrap').appendChild(el);setTimeout(()=>el.remove(),4200)}
+function getDayName(iso){if(!iso)return'';return ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'][new Date(iso+'T12:00:00').getDay()]||''}
+function monthName(key){if(!key)return'כל החודשים';const [y,m]=key.split('-');return `${m}/${y}`}
+function updateDayName(){ $('dayName').value=getDayName($('logDate').value); if(!$('monthKey').value && $('logDate').value) $('monthKey').value=$('logDate').value.slice(0,7); }
+function setStatus(msg){$('syncStatus').textContent=msg;$('storageMode').textContent=storageMode==='cloud'?'ענן':'מקומי';}
+function saveLocal(){
+  localStorage.setItem(LOCAL_KEY,JSON.stringify(logs));
+  localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));
+  localStorage.setItem(CONTRACTOR_MEMORY_KEY,JSON.stringify(contractorMemory));
+}
+
+function loadLocal(){
+  try{logs=JSON.parse(localStorage.getItem(LOCAL_KEY)||'[]')||[]}catch{logs=[]}
+  try{projects=JSON.parse(localStorage.getItem(PROJECTS_KEY)||'null')||projects}catch{}
+  try{contractorMemory=JSON.parse(localStorage.getItem(CONTRACTOR_MEMORY_KEY)||'null')||contractorMemory}catch{}
+  contractorMemory.custom=Array.from(new Set([...(contractorMemory.custom||[]),'ויסאם'].filter(Boolean)));
+  contractorMemory.hidden=Array.from(new Set((contractorMemory.hidden||[]).filter(Boolean)));
+  if(!logs.length){logs=DEFAULT_LOGS.map(normalizeLog);saveLocal();}
+}
+
+function cloneState(){
+  return {
+    logs: JSON.parse(JSON.stringify(logs)),
+    projects: JSON.parse(JSON.stringify(projects)),
+    contractorMemory: JSON.parse(JSON.stringify(contractorMemory)),
+    editingId
+  };
+}
+function loadUndo(){
+  try{undoStack=JSON.parse(localStorage.getItem(UNDO_KEY)||'[]')||[]}catch{undoStack=[]}
+  updateUndoPanel();
+}
+function saveUndo(){
+  localStorage.setItem(UNDO_KEY,JSON.stringify(undoStack.slice(-20)));
+  updateUndoPanel();
+}
+function pushUndo(label){
+  undoStack.push({...cloneState(),label:label||'פעולה'});
+  if(undoStack.length>20) undoStack=undoStack.slice(-20);
+  saveUndo();
+}
+function updateUndoPanel(){
+  const p=$('undoPanel');
+  if(!p) return;
+  if(!undoStack.length){p.classList.add('hidden');return}
+  p.classList.remove('hidden');
+  const last=undoStack[undoStack.length-1];
+  if($('undoText')) $('undoText').textContent='אפשר לבטל: '+(last.label||'פעולה אחרונה');
+}
+async function undoLastAction(){
+  if(!undoStack.length){toast('אין פעולה לביטול','warn');return}
+  const snap=undoStack.pop();
+  const currentIds=new Set(logs.map(l=>l.id));
+  const prevIds=new Set((snap.logs||[]).map(l=>l.id));
+  logs=(snap.logs||[]).map(normalizeLog);
+  projects=snap.projects||projects;
+  contractorMemory=snap.contractorMemory||contractorMemory;
+  editingId=snap.editingId||null;
+  saveLocal();saveUndo();
+  renderProjectFilter();renderContractorFilter();renderContractorManager();renderContractorSelectOptions(getSelectedContractor()||'ויסאם');renderAll();
+  if(accessToken){
+    for(const id of currentIds){if(!prevIds.has(id)){try{await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:getAuthHeaders()})}catch{}}}
+    for(const l of logs){try{await cloudUpsert(l)}catch{}}
+  }
+  toast('הפעולה האחרונה בוטלה ושוחזרה ✅','ok');
+}
+
+function normalizeLog(row){return{id:row.id||uid(),created_at:row.created_at||new Date().toISOString(),updated_at:row.updated_at||new Date().toISOString(),sort_order:Number(row.sort_order||999999),log_date:row.log_date||todayISO(),day_name:row.day_name||getDayName(row.log_date||todayISO()),month_key:row.month_key||(row.log_date||todayISO()).slice(0,7),project_number:row.project_number||'23466',project_name:row.project_name||'מלון סאן דרומי',contractor_name:row.contractor_name||'',contractor_manager:row.contractor_manager||'',contractor_phone:row.contractor_phone||'',tower:row.tower||'דרומי',floor:row.floor||'',area:row.area||'',room:row.room||'',workers:Array.isArray(row.workers)?row.workers:[],planned_work:row.planned_work||'',done_work:row.done_work||'',quantities:row.quantities||'',notes:row.notes||'',next_tasks:row.next_tasks||'',tasks:Array.isArray(row.tasks)?row.tasks:[],start_time:row.start_time||'',end_time:row.end_time||'',break_minutes:Number(row.break_minutes||0),approved_hours:Number(row.approved_hours||0),payment_type:row.payment_type||'לפי שעות',rate:Number(row.rate||0),amount:Number(row.amount||0),status:row.status||'טיוטה',supervisor_name:row.supervisor_name||'אחמד ח׳אליל',supervisor_role:row.supervisor_role||'מהנדס טכני - מנהל עבודה',approval_note:row.approval_note||'',user_email:row.user_email||(currentUser?.email||'')}}
+function getAuthHeaders(){return {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(accessToken||SUPABASE_KEY),'Content-Type':'application/json','Prefer':'return=representation'}}
+async function doLogin(){
+  const emailRaw=$('loginEmail').value.trim();
+  const email=emailRaw.toLowerCase();
+  const password=$('loginPassword').value;
+  $('loginError').classList.add('hidden');
+
+  if(!emailRaw||!password){
+    $('loginError').textContent='יש למלא מייל וסיסמה';
+    $('loginError').classList.remove('hidden');
+    return;
+  }
+
+  if(!email.endsWith(ALLOWED_EMAIL_DOMAIN)){
+    $('loginError').textContent='הכניסה מותרת רק למייל שמסתיים ב־'+ALLOWED_EMAIL_DOMAIN;
+    $('loginError').classList.remove('hidden');
+    return;
+  }
+
+  if(password!==SHARED_LOGIN_PASSWORD){
+    $('loginError').textContent='סיסמה שגויה';
+    $('loginError').classList.remove('hidden');
+    return;
+  }
+
+  $('loginBtn').disabled=true;
+  $('loginBtn').textContent='מתחבר...';
+
+  try{
+    // 1) ניסיון התחברות רגילה ל-Supabase Auth
+    let res=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({email:emailRaw,password:SHARED_LOGIN_PASSWORD})
+    });
+    let data=await res.json();
+
+    // 2) אם המשתמש עדיין לא קיים, ננסה ליצור אותו אוטומטית
+    if(!data.access_token){
+      const signup=await fetch(`${SUPABASE_URL}/auth/v1/signup`,{
+        method:'POST',
+        headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},
+        body:JSON.stringify({email:emailRaw,password:SHARED_LOGIN_PASSWORD})
+      });
+      const signupData=await signup.json();
+
+      // אם Supabase מחזיר session אחרי signUp
+      if(signupData.access_token){
+        data=signupData;
+      }else if(signupData.user && !signupData.access_token){
+        throw new Error('המשתמש נוצר אבל צריך אישור מייל / Confirm Email ב-Supabase לפני כניסה.');
+      }else{
+        throw new Error(signupData.error_description || signupData.msg || signupData.error || data.error_description || data.msg || data.error || 'שגיאה בהתחברות');
+      }
+    }
+
+    accessToken=data.access_token;
+    currentUser=data.user || {email:emailRaw};
+    localStorage.setItem('mashav_session',JSON.stringify({
+      access_token:data.access_token,
+      refresh_token:data.refresh_token,
+      expires_at:data.expires_at,
+      user:data.user || {email:emailRaw}
+    }));
+
+    await showApp();
+
+  }catch(e){
+    $('loginError').textContent='שגיאה: '+e.message;
+    $('loginError').classList.remove('hidden');
+  }finally{
+    $('loginBtn').disabled=false;
+    $('loginBtn').textContent='🔐 התחבר למערכת';
+  }
+}
+
+async function refreshSession(refreshToken){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({refresh_token:refreshToken})
+    });
+    const data=await res.json();
+    const email=(data.user?.email||'').toLowerCase();
+    if(data.access_token && email.endsWith(ALLOWED_EMAIL_DOMAIN)){
+      accessToken=data.access_token;
+      currentUser=data.user;
+      localStorage.setItem('mashav_session',JSON.stringify({
+        access_token:data.access_token,
+        refresh_token:data.refresh_token,
+        expires_at:data.expires_at,
+        user:data.user
+      }));
+      await showApp();
+      return true;
+    }
+  }catch{}
+  return false
+}
+
+async function checkAuth(){
+  loadLocal();
+  const saved=localStorage.getItem('mashav_session');
+  if(saved){
+    try{
+      const s=JSON.parse(saved);
+      const email=(s.user?.email||'').toLowerCase();
+      if(email.endsWith(ALLOWED_EMAIL_DOMAIN)){
+        if(s.expires_at&&s.expires_at*1000>Date.now()){
+          accessToken=s.access_token;
+          currentUser=s.user;
+          await showApp();
+          return;
+        }
+        if(s.refresh_token&&await refreshSession(s.refresh_token))return;
+      }
+    }catch{}
+  }
+  $('loginEmail').value=DEFAULT_LOGIN_EMAIL;
+  $('loginScreen').classList.remove('hidden')
+}
+
+async function continueLocal(){accessToken=null;currentUser={email:'משתמש מקומי'};await showApp(true)}
+async function showApp(localOnly=false){$('loginScreen').classList.add('hidden');$('mainApp').classList.remove('hidden');$('userEmail').textContent=currentUser?.email||'מקומי';$('logDate').value=todayISO();$('dayName').value=getDayName(todayISO());$('monthKey').value=todayISO().slice(0,7);initWorkers();bindAutoSave();renderProjectFilter();renderContractorFilter();if(localOnly){storageMode='local';setStatus('💾 עבודה במצב מקומי');renderAll();return}await loadLogs()}
+function logout(){
+  if(!confirm('לצאת מהמערכת ולחזור למסך הכניסה?'))return;
+  localStorage.removeItem('mashav_session');
+  accessToken=null;
+  currentUser=null;
+  $('mainApp').classList.add('hidden');
+  $('loginScreen').classList.remove('hidden');
+  $('loginPassword').value='';
+  $('loginEmail').value=DEFAULT_LOGIN_EMAIL;
+  toast('יצאת מהמערכת','ok');
+}
+
+async function loadLogs(){loadLocal();if(accessToken){try{const res=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=*&order=sort_order.asc,log_date.asc`,{headers:getAuthHeaders()});if(res.ok){const data=await res.json();if(Array.isArray(data)&&data.length){logs=data.map(normalizeLog);saveLocal();}storageMode='cloud';setStatus('☁️ מסונכרן לענן Supabase')}else{storageMode='local';setStatus('⚠️ הטבלה בענן לא זמינה — עובד מקומית')}}catch(e){storageMode='local';setStatus('⚠️ אין חיבור לענן — עובד מקומית')}}else{storageMode='local';setStatus('💾 עבודה במצב מקומי')}renderAll()}
+async function cloudUpsert(log){if(!accessToken)return false;try{const res=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${encodeURIComponent(log.id)}`,{method:'PATCH',headers:getAuthHeaders(),body:JSON.stringify(log)});if(res.ok){const arr=await res.json();if(arr&&arr.length)return true}const res2=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,{method:'POST',headers:getAuthHeaders(),body:JSON.stringify(log)});return res2.ok}catch{return false}}
+function collectWorkers(){return [...document.querySelectorAll('#workersBody tr')].map(tr=>({name:tr.querySelector('.w-name')?.value.trim()||'',role:tr.querySelector('.w-role')?.value.trim()||'',present:tr.querySelector('.w-present')?.checked??true})).filter(w=>w.name)}
+function setWorkers(workers=[]){$('workersBody').innerHTML='';if(!workers.length){addWorkerRow();addWorkerRow();return}workers.forEach(w=>addWorkerRow(w));updateWorkersCount()}
+function addWorkerRow(w={name:'',role:'',present:true}){const idx=$('workersBody').children.length+1;const tr=document.createElement('tr');tr.innerHTML=`<td class="w-num">${idx}</td><td><input class="mini-input w-name" value="${escapeHtml(w.name)}" placeholder="שם מלא" oninput="updateWorkersCount()"></td><td><input class="mini-input w-role" value="${escapeHtml(w.role||'')}" placeholder="תפקיד"></td><td><input type="checkbox" class="w-present" ${w.present!==false?'checked':''}></td><td><button class="icon-btn" onclick="this.closest('tr').remove();renumberWorkers();updateWorkersCount()">🗑️</button></td>`;$('workersBody').appendChild(tr);updateWorkersCount()}
+function renumberWorkers(){[...document.querySelectorAll('.w-num')].forEach((td,i)=>td.textContent=i+1)}
+function initWorkers(){if(!$('workersBody').children.length){addWorkerRow();addWorkerRow()}}
+function addManyWorkers(){const names=prompt('הדבק שמות פועלים, כל שם בשורה נפרדת:');if(!names)return;names.split(/\n|,/).map(x=>x.trim()).filter(Boolean).forEach(n=>addWorkerRow({name:n,role:'',present:true}))}
+function updateWorkersCount(){$('workersCount').textContent=collectWorkers().length}
+function collectTasks(){return [...document.querySelectorAll('#tasksBody tr')].map(tr=>({priority:tr.querySelector('.t-priority')?.value||'בינונית',task:tr.querySelector('.t-task')?.value.trim()||'',status:tr.querySelector('.t-status')?.value||'פתוח',due:tr.querySelector('.t-due')?.value||'',note:tr.querySelector('.t-note')?.value.trim()||''})).filter(t=>t.task)}
+function setTasks(tasks=[]){$('tasksBody').innerHTML='';if(!tasks.length){addTaskRow();return}tasks.forEach(t=>addTaskRow(t));renumberTasks()}
+function addTaskRow(t={priority:'בינונית',task:'',status:'פתוח',due:'',note:''}){const idx=$('tasksBody').children.length+1;const tr=document.createElement('tr');tr.innerHTML=`<td class="t-num">${idx}</td><td><select class="mini-input t-priority"><option ${t.priority==='גבוהה'?'selected':''}>גבוהה</option><option ${t.priority==='בינונית'?'selected':''}>בינונית</option><option ${t.priority==='נמוכה'?'selected':''}>נמוכה</option></select></td><td><input class="mini-input t-task" value="${escapeHtml(t.task)}" placeholder="משימה לקבלן"></td><td><select class="mini-input t-status"><option ${t.status==='פתוח'?'selected':''}>פתוח</option><option ${t.status==='בתהליך'?'selected':''}>בתהליך</option><option ${t.status==='בוצע'?'selected':''}>בוצע</option><option ${t.status==='דחוף'?'selected':''}>דחוף</option></select></td><td><input type="date" class="mini-input t-due" value="${escapeHtml(t.due)}"></td><td><input class="mini-input t-note" value="${escapeHtml(t.note)}" placeholder="הערה"></td><td><button class="icon-btn" onclick="this.closest('tr').remove();renumberTasks()">🗑️</button></td>`;$('tasksBody').appendChild(tr)}
+function renumberTasks(){[...document.querySelectorAll('.t-num')].forEach((td,i)=>td.textContent=i+1)}
+function calcHours(){const st=$('startTime').value,en=$('endTime').value,br=Number($('breakMinutes').value||0);if(st&&en){const [sh,sm]=st.split(':').map(Number),[eh,em]=en.split(':').map(Number);let mins=(eh*60+em)-(sh*60+sm)-br;if(mins<0)mins+=24*60;$('approvedHours').value=(mins/60).toFixed(2)}calcAmount()}
+function calcAmount(){const type=$('paymentType').value,rate=Number($('rate').value||0),hours=Number($('approvedHours').value||0);if(rate){$('amount').value=type==='לפי שעות'?(rate*hours).toFixed(2):rate.toFixed(2)}}
+
+
+function getSelectedContractor(){
+  const sel=$('contractorSelect')?.value || 'אחר';
+  if(sel==='אחר') return ($('contractorName')?.value || '').trim();
+  return sel;
+}
+function allContractorsFromLogs(){
+  return [...new Set(logs.map(l=>l.contractor_name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'he'));
+}
+function knownContractors(){
+  const hidden=new Set(contractorMemory.hidden||[]);
+  const names=new Set(['ויסאם',...(contractorMemory.custom||[])]);
+  logs.forEach(l=>{if(l.contractor_name && !hidden.has(l.contractor_name)) names.add(l.contractor_name)});
+  return [...names].filter(Boolean).filter(n=>!hidden.has(n)).sort((a,b)=>a==='ויסאם'?-1:b==='ויסאם'?1:a.localeCompare(b,'he'));
+}
+function addContractorToMemory(name){
+  name=(name||'').trim();
+  if(!name) return;
+  contractorMemory.hidden=(contractorMemory.hidden||[]).filter(x=>x!==name);
+  if(!contractorMemory.custom.includes(name)) contractorMemory.custom.push(name);
+  contractorMemory.custom=Array.from(new Set(contractorMemory.custom.filter(Boolean)));
+  saveLocal();
+}
+function renderContractorSelectOptions(selected='ויסאם'){
+  const sel=$('contractorSelect');
+  if(!sel) return;
+  const names=knownContractors();
+  const current=selected || sel.value || 'ויסאם';
+  sel.innerHTML=names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('') + '<option value="אחר">אחר / הוספה ידנית</option>';
+  sel.value=names.includes(current) ? current : 'אחר';
+}
+function setSelectedContractor(name){
+  name=(name||'').trim();
+  renderContractorSelectOptions(name || 'ויסאם');
+  const names=knownContractors();
+  if(name && names.includes(name)){
+    if($('contractorSelect')) $('contractorSelect').value=name;
+    if($('contractorName')) $('contractorName').value='';
+  }else if(name && name!=='ויסאם'){
+    if($('contractorSelect')) $('contractorSelect').value='אחר';
+    if($('contractorName')) $('contractorName').value=name;
+  }else{
+    if($('contractorSelect')) $('contractorSelect').value='ויסאם';
+    if($('contractorName')) $('contractorName').value='';
+  }
+  handleContractorSelect(false);
+}
+function handleContractorSelect(doFocus=true){
+  const isOther=$('contractorSelect') && $('contractorSelect').value==='אחר';
+  if($('contractorCustomWrap')) $('contractorCustomWrap').classList.toggle('hidden', !isOther);
+  if(isOther && doFocus && $('contractorName')) $('contractorName').focus();
+}
+function openContractorManager(){
+  renderContractorManager();
+  $('contractorModal').classList.add('active');
+}
+function closeContractorManager(force){
+  if(force===true || force?.target?.id==='contractorModal') $('contractorModal').classList.remove('active');
+}
+function renderContractorManager(){
+  const names=allContractorsFromLogs();
+  const sel=$('contractorManageSelect');
+  if(sel){
+    sel.innerHTML=names.length?names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join(''):'<option value="">אין קבלנים</option>';
+  }
+  const hidden=$('hiddenContractorSelect');
+  if(hidden){
+    const h=(contractorMemory.hidden||[]);
+    hidden.innerHTML=h.length?h.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join(''):'<option value="">אין שמות מוסרים</option>';
+  }
+  fillRenameContractor();
+  const info=$('contractorManageInfo');
+  if(info) info.innerHTML=`סה״כ קבלנים ביומנים: <b>${names.length}</b><br>שמות מוסרים מרשימת הבחירה: <b>${(contractorMemory.hidden||[]).length}</b>`;
+}
+function fillRenameContractor(){
+  const old=$('contractorManageSelect')?.value || '';
+  if($('contractorRenameInput')) $('contractorRenameInput').value=old;
+}
+async function renameContractorEverywhere(){
+  const oldName=($('contractorManageSelect')?.value||'').trim();
+  const newName=($('contractorRenameInput')?.value||'').trim();
+  if(!oldName||!newName){toast('בחר שם קבלן והקלד שם חדש','bad');return}
+  if(oldName===newName){toast('השם החדש זהה לשם הישן','warn');return}
+  const affected=logs.filter(l=>l.contractor_name===oldName);
+  if(!affected.length){toast('לא נמצאו יומנים בשם הזה','warn');return}
+  if(!confirm(`לתקן את שם הקבלן בכל היומנים?\\n${oldName} ← ${newName}\\nסה״כ ימים שיושפעו: ${affected.length}`)) return;
+  pushUndo('תיקון שם קבלן');
+  affected.forEach(l=>{l.contractor_name=newName;l.updated_at=new Date().toISOString()});
+  contractorMemory.custom=(contractorMemory.custom||[]).filter(x=>x!==oldName);
+  addContractorToMemory(newName);
+  contractorMemory.hidden=(contractorMemory.hidden||[]).filter(x=>x!==oldName && x!==newName);
+  saveLocal();
+  if(accessToken){for(const l of affected){try{await cloudUpsert(l)}catch{}}}
+  renderProjectFilter();renderContractorFilter();renderContractorManager();renderContractorSelectOptions(newName);renderContractorManager();renderAll();
+  toast('שם הקבלן תוקן בכל היומנים ✅','ok');
+}
+function hideContractorFromMemory(){
+  const name=($('contractorManageSelect')?.value||'').trim();
+  if(!name){toast('בחר קבלן להסרה מהרשימה','bad');return}
+  if(name==='ויסאם' && !confirm('ויסאם הוא קבלן ברירת מחדל. להסיר אותו מרשימת הבחירה?')) return;
+  pushUndo('הסרת שם קבלן מהרשימה');
+  contractorMemory.hidden=Array.from(new Set([...(contractorMemory.hidden||[]),name]));
+  contractorMemory.custom=(contractorMemory.custom||[]).filter(x=>x!==name);
+  saveLocal();
+  renderContractorFilter();renderContractorSelectOptions(getSelectedContractor());renderContractorManager();renderAll();
+  toast('השם הוסר מרשימת הבחירה בלבד. היומנים נשארו שמורים.','ok');
+}
+function restoreContractorToMemory(){
+  const name=($('hiddenContractorSelect')?.value||'').trim();
+  if(!name){toast('אין שם להחזיר','warn');return}
+  pushUndo('החזרת שם קבלן לרשימה');
+  contractorMemory.hidden=(contractorMemory.hidden||[]).filter(x=>x!==name);
+  addContractorToMemory(name);
+  renderContractorFilter();renderContractorSelectOptions(name);renderContractorManager();renderAll();
+  toast('השם הוחזר לרשימת הבחירה ✅','ok');
+}
+function monthFromValue(){return $('monthFrom')?.value||''}
+function monthToValue(){return $('monthTo')?.value||''}
+function monthInRange(m){
+  const f=monthFromValue(), t=monthToValue();
+  if(f && m<f) return false;
+  if(t && m>t) return false;
+  return true;
+}
+function monthRangeText(){
+  const f=monthFromValue(), t=monthToValue();
+  if(!f&&!t) return 'כל השנים';
+  if(f&&t&&f===t) return monthName(f);
+  return `${f?monthName(f):'מהתחלה'} עד ${t?monthName(t):'היום'}`;
+}
+function setMonthPreset(mode){
+  const base=monthFromValue() || monthToValue() || currentMonth();
+  const year=(base||currentMonth()).slice(0,4);
+  if(mode==='all'){
+    $('monthFrom').value='';
+    $('monthTo').value='';
+  }else if(mode==='year'){
+    $('monthFrom').value=year+'-01';
+    $('monthTo').value=year+'-12';
+  }else{
+    const m=base||currentMonth();
+    $('monthFrom').value=m;
+    $('monthTo').value=m;
+  }
+  renderAll();
+}
+function syncMonthPreset(){
+  const f=monthFromValue(), t=monthToValue();
+  if($('monthPreset')){
+    if(!f&&!t) $('monthPreset').value='all';
+    else if(f&&t&&f.slice(0,4)===t.slice(0,4)&&f.endsWith('-01')&&t.endsWith('-12')) $('monthPreset').value='year';
+    else $('monthPreset').value='month';
+  }
+}
+
+function currentFormIsReadyForAutoSave(){
+  return !!(($('logDate')?.value) && ($('projectNumber')?.value.trim()) && getSelectedContractor());
+}
+let autoSaveTimer=null;
+function bindAutoSave(){
+  const form=document.querySelector('.layout section.card:nth-child(2)');
+  if(!form || form.dataset.autosaveBound) return;
+  form.dataset.autosaveBound='1';
+  form.addEventListener('input',()=>autoSaveFromForm());
+  form.addEventListener('change',()=>autoSaveFromForm());
+}
+function autoSaveFromForm(){
+  // שמירה אוטומטית רק כשעורכים יום עבודה קיים.
+  // ביום/קבלן חדש צריך ללחוץ שמור, כדי לא להחליף בטעות קבלן אחר.
+  if(!editingId) return;
+  if(!currentFormIsReadyForAutoSave()) return;
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(()=>saveLog(true,true,false),700);
+}
+
+function setAutoSaveText(txt){
+  const el=$('autoSaveStatus');
+  if(el) el.textContent=txt;
+}
+function locationsUnique(items){
+  const set=new Set();
+  items.forEach(l=>{
+    const parts=[l.area||'',l.floor?('קומה '+l.floor):'',l.room||''].filter(Boolean).join(' • ').trim();
+    if(parts) set.add(parts);
+  });
+  return [...set];
+}
+function workerSummary(items){
+  const map={};
+  items.forEach(l=>(l.workers||[]).forEach(w=>{
+    if(!w.name) return;
+    map[w.name]=(map[w.name]||0)+1;
+  }));
+  return map;
+}
+function groupTotals(items){
+  return {
+    days:items.length,
+    workers:items.reduce((s,l)=>s+(l.workers||[]).length,0),
+    hours:items.reduce((s,l)=>s+Number(l.approved_hours||0),0),
+    amount:items.reduce((s,l)=>s+Number(l.amount||0),0),
+    locations:locationsUnique(items),
+    workerMap:workerSummary(items)
+  }
+}
+
+function formLog(){return normalizeLog({id:editingId||uid(),created_at:editingId?(logs.find(x=>x.id===editingId)?.created_at||new Date().toISOString()):new Date().toISOString(),updated_at:new Date().toISOString(),sort_order:editingId?(logs.find(x=>x.id===editingId)?.sort_order||logs.length+1):(logs.length+1),log_date:$('logDate').value||todayISO(),day_name:$('dayName').value||getDayName($('logDate').value||todayISO()),month_key:$('monthKey').value||($('logDate').value||todayISO()).slice(0,7),project_number:$('projectNumber').value.trim()||'23466',project_name:$('projectName').value.trim()||'מלון סאן דרומי',contractor_name:getSelectedContractor(),contractor_manager:$('contractorManager').value.trim(),contractor_phone:$('contractorPhone').value.trim(),tower:$('tower').value,floor:$('floor').value.trim(),area:$('area').value.trim(),room:$('room').value.trim(),workers:collectWorkers(),planned_work:$('plannedWork').value.trim(),done_work:$('doneWork').value.trim(),quantities:$('quantities').value.trim(),notes:$('notes').value.trim(),next_tasks:$('nextTasks').value.trim(),tasks:collectTasks(),start_time:$('startTime').value,end_time:$('endTime').value,break_minutes:Number($('breakMinutes').value||0),approved_hours:Number($('approvedHours').value||0),payment_type:$('paymentType').value,rate:Number($('rate').value||0),amount:Number($('amount').value||0),status:$('status').value,supervisor_name:$('supervisorName').value.trim(),supervisor_role:$('supervisorRole').value.trim(),approval_note:$('approvalNote').value.trim(),user_email:currentUser?.email||''})}
+async function saveLog(silent=false,fromAuto=false,forceNew=false){
+  let log=formLog();
+  if(!log.contractor_name){toast('חובה למלא שם קבלן','bad');return}
+  if(!log.project_number||!log.project_name){toast('חובה למלא פרויקט','bad');return}
+
+  const existing=editingId ? logs.find(x=>x.id===editingId) : null;
+
+  // אם המשתמש שינה קבלן/חודש/פרויקט בזמן שערך יום קיים,
+  // לא מחליפים את הרשומה הקודמת בלי לשאול — כדי לא למחוק קבלן אחר בטעות.
+  if(existing && !fromAuto && !forceNew){
+    const identityChanged =
+      existing.contractor_name!==log.contractor_name ||
+      existing.month_key!==log.month_key ||
+      existing.project_number!==log.project_number;
+    if(identityChanged){
+      const createNew=confirm('שינית קבלן / חודש / פרויקט. ליצור יום עבודה חדש במקום להחליף את הקיים?\\n\\nאישור = ליצור חדש\\nביטול = לעדכן את היום הקיים');
+      if(createNew){
+        forceNew=true;
+      }
+    }
+  }
+
+  if(forceNew){
+    log.id=uid();
+    log.created_at=new Date().toISOString();
+    log.updated_at=new Date().toISOString();
+    log.sort_order=logs.length+1;
+    editingId=null;
+  }
+
+  if(!fromAuto) pushUndo(forceNew?'יצירת יום עבודה חדש':'שמירת יום עבודה');
+
+  const i=logs.findIndex(x=>x.id===log.id);
+  if(i>=0) logs[i]=log; else logs.unshift(log);
+
+  addProject(log.project_number,log.project_name);addContractorToMemory(log.contractor_name);
+  saveLocal();
+
+  let cloud=false;
+  if(accessToken) cloud=await cloudUpsert(log);
+
+  if(cloud){storageMode='cloud';setStatus('☁️ נשמר בענן Supabase')}
+  else{storageMode='local';setStatus('💾 נשמר מקומית')}
+
+  editingId=log.id;
+  renderProjectFilter();renderContractorFilter();renderContractorManager();renderContractorSelectOptions(log.contractor_name);renderAll();
+
+  if(fromAuto){setAutoSaveText(cloud?'נשמר בענן אוטומטית':'נשמר מקומית אוטומטית')}
+  else if(!silent) toast('יום העבודה נשמר ביומן ✅',cloud?'ok':'warn')
+}
+
+async function saveAndNew(){
+  await saveLog(false,false,false);
+  const savedContractor=getSelectedContractor();
+  const savedMonth=$('monthKey').value || (monthFromValue() || monthToValue() || currentMonth());
+  const savedProjectNumber=$('projectNumber').value||'23466';
+  const savedProjectName=$('projectName').value||'מלון סאן דרומי';
+  resetForm();
+  $('projectNumber').value=savedProjectNumber;
+  $('projectName').value=savedProjectName;
+  $('monthKey').value=savedMonth;
+  $('monthFrom').value=savedMonth;$('monthTo').value=savedMonth;syncMonthPreset();
+  setSelectedContractor(savedContractor);
+  editingId=null;
+  setAutoSaveText('רשומה חדשה — לחץ שמור כדי להוסיף');
+  toast('נשמר. אפשר להוסיף עכשיו יום נוסף בלי להחליף את הקודם ✅','ok');
+}
+function newParallelContractorDay(){
+  const keepProjectNumber=$('projectNumber').value||'23466';
+  const keepProjectName=$('projectName').value||'מלון סאן דרומי';
+  const keepMonth=$('monthKey').value || (monthFromValue() || monthToValue() || currentMonth());
+  editingId=null;
+  $('formTitle').textContent='הוספת יום עבודה לקבלן נוסף במקביל';
+  $('editingBadge').textContent='חדש';
+  ['contractorName','contractorManager','contractorPhone','floor','area','room','plannedWork','doneWork','quantities','notes','nextTasks','startTime','endTime','rate','amount','approvalNote'].forEach(id=>{if($(id))$(id).value=''});
+  $('logDate').value=todayISO();
+  $('dayName').value=getDayName(todayISO());
+  $('monthKey').value=keepMonth;
+  $('monthFrom').value=keepMonth;$('monthTo').value=keepMonth;syncMonthPreset();
+  $('projectNumber').value=keepProjectNumber;
+  $('projectName').value=keepProjectName;
+  $('tower').value='דרומי';
+  $('breakMinutes').value='0';
+  $('approvedHours').value='0';
+  $('paymentType').value='לפי שעות';
+  $('status').value='טיוטה';
+  setWorkers([]);
+  setTasks([]);
+  renderContractorSelectOptions('אחר');
+  $('contractorSelect').value='אחר';
+  handleContractorSelect(true);
+  setAutoSaveText('רשומה חדשה — לחץ שמור כדי להוסיף');
+  toast('פתחתי קבלן/יום חדש במקביל. שמירה לא תחליף את הקודם.','ok');
+}
+
+function approveCurrent(){$('status').value='מאושר לתשלום';$('approvalNote').value=$('approvalNote').value||'מאושר לתשלום לפי יומן זה';saveLog()}
+function duplicateCurrent(){
+  const l=formLog();
+  pushUndo('שכפול יום עבודה');
+  l.id=uid();l.created_at=new Date().toISOString();l.updated_at=new Date().toISOString();l.sort_order=logs.length+1;l.status='טיוטה';
+  logs.unshift(l);editingId=l.id;saveLocal();loadToForm(l.id);renderContractorFilter();renderAll();toast('שוכפל — אפשר לערוך ולשמור','ok')
+}
+
+async function deleteCurrent(){if(!editingId){toast('אין יום עבודה שנבחר למחיקה','warn');return}await deleteLogById(editingId)}
+async function deleteLogById(id){
+  const l=logs.find(x=>x.id===id);if(!l){toast('היומן לא נמצא','bad');return}
+  if(!confirm(`למחוק את יום העבודה של ${l.contractor_name || 'הקבלן'} בתאריך ${formatDate(l.log_date)}?`))return;
+  pushUndo('מחיקת יום עבודה');
+  logs=logs.filter(x=>x.id!==id);saveLocal();
+  if(accessToken){try{await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:getAuthHeaders()})}catch{}}
+  if(editingId===id)resetForm();renderContractorFilter();renderAll();toast('נמחק בהצלחה — אפשר ללחוץ חזור פעולה לשחזור','ok')
+}
+
+async function deleteJournalGroup(key){
+  const group=buildGroups().find(g=>g.key===key);if(!group)return;
+  if(!confirm(`למחוק את כל היומן של ${group.contractor} לחודש ${monthName(group.month)}?`))return;
+  pushUndo('מחיקת יומן חודשי');
+  const ids=new Set(group.logs.map(l=>l.id));logs=logs.filter(l=>!ids.has(l.id));saveLocal();
+  if(accessToken){for(const id of ids){try{await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:getAuthHeaders()})}catch{}}}
+  renderContractorFilter();renderAll();toast('היומן החודשי נמחק — אפשר ללחוץ חזור פעולה לשחזור','ok')
+}
+
+function resetForm(){editingId=null;$('formTitle').textContent='הוספת יום עבודה ליומן';$('editingBadge').textContent='טיוטה';const keepN=$('projectNumber').value||'23466',keepP=$('projectName').value||'מלון סאן דרומי',keepC=getSelectedContractor()||'';['contractorManager','contractorPhone','floor','area','room','plannedWork','doneWork','quantities','notes','nextTasks','startTime','endTime','rate','amount','approvalNote'].forEach(id=>$(id).value='');$('logDate').value=todayISO();$('dayName').value=getDayName(todayISO());$('monthKey').value=(monthFromValue() || monthToValue() || todayISO().slice(0,7));$('projectNumber').value=keepN;$('projectName').value=keepP;setSelectedContractor(keepC);$('tower').value='דרומי';$('breakMinutes').value='0';$('approvedHours').value='0';$('paymentType').value='לפי שעות';$('status').value='טיוטה';$('supervisorName').value='אחמד ח׳אליל';$('supervisorRole').value='מהנדס טכני - מנהל עבודה';setWorkers([]);setTasks([])}
+function addDayToJournal(key){
+  const group=buildGroups().find(g=>g.key===key);if(!group)return;
+  resetForm();
+  $('projectNumber').value=group.project_number;
+  $('projectName').value=group.project_name;
+  setSelectedContractor(group.contractor);
+  $('monthKey').value=group.month;
+  $('monthFrom').value=group.month;$('monthTo').value=group.month;syncMonthPreset();
+  editingId=null;
+  setAutoSaveText('רשומה חדשה — לחץ שמור כדי להוסיף');
+  toast('פתחתי יום עבודה חדש בתוך היומן של '+group.contractor,'ok');
+  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})
+}
+
+function loadToForm(id){const l=logs.find(x=>x.id===id);if(!l)return;editingId=id;$('formTitle').textContent='עריכת יום עבודה בתוך יומן';$('editingBadge').textContent=l.status;$('logDate').value=l.log_date;$('dayName').value=l.day_name;$('monthKey').value=l.month_key;$('projectNumber').value=l.project_number;$('projectName').value=l.project_name;setSelectedContractor(l.contractor_name);$('contractorManager').value=l.contractor_manager;$('contractorPhone').value=l.contractor_phone;$('tower').value=l.tower;$('floor').value=l.floor;$('area').value=l.area;$('room').value=l.room;$('plannedWork').value=l.planned_work;$('doneWork').value=l.done_work;$('quantities').value=l.quantities;$('notes').value=l.notes;$('nextTasks').value=l.next_tasks;$('startTime').value=l.start_time;$('endTime').value=l.end_time;$('breakMinutes').value=l.break_minutes;$('approvedHours').value=l.approved_hours;$('paymentType').value=l.payment_type;$('rate').value=l.rate||'';$('amount').value=l.amount||'';$('status').value=l.status;$('supervisorName').value=l.supervisor_name;$('supervisorRole').value=l.supervisor_role;$('approvalNote').value=l.approval_note;setWorkers(l.workers);setTasks(l.tasks);window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
+function addProject(number,name){if(!number||!name)return;if(!projects.some(p=>p.number===number)){projects.push({number,name});saveLocal()}}
+function renderProjectFilter(){
+  const sel=$('projectFilter'),current=sel.value||'all';
+  sel.innerHTML='<option value="all">כל הפרויקטים</option>'+projects.map(p=>`<option value="${escapeHtml(p.number)}">${escapeHtml(p.number)} | ${escapeHtml(p.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===current)?current:'all';
+  if(!$('monthFrom').value && !$('monthTo').value && logs.some(l=>l.month_key==='2026-01')){
+    $('monthFrom').value='2026-01';
+    $('monthTo').value='2026-01';
+    if($('monthPreset')) $('monthPreset').value='month';
+  }
+}
+
+function renderContractorFilter(){
+  const sel=$('contractorFilter'),current=sel.value||'all';
+  const names=[...new Set(logs.map(l=>l.contractor_name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'he'));
+  sel.innerHTML='<option value="all">כל הקבלנים</option>'+names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===current)?current:'all';
+  renderContractorSelectOptions(getSelectedContractor()||'ויסאם');
+}
+
+function filteredLogs(){
+  const q=$('searchInput').value.trim().toLowerCase(),pf=$('projectFilter').value,cf=$('contractorFilter').value,sort=$('sortMode').value;
+  let out=logs.filter(l=>{
+    if(pf!=='all'&&l.project_number!==pf)return false;
+    if(!monthInRange(l.month_key))return false;
+    if(cf!=='all'&&l.contractor_name!==cf)return false;
+    if(q){
+      const blob=[l.project_number,l.project_name,l.contractor_name,l.contractor_manager,l.tower,l.floor,l.area,l.room,l.planned_work,l.done_work,l.quantities,l.notes,l.next_tasks,(l.workers||[]).map(w=>w.name).join(' '),(l.tasks||[]).map(t=>t.task).join(' ')].join(' ').toLowerCase();
+      if(!blob.includes(q))return false
+    }
+    return true
+  });
+  if(sort==='manual')out.sort((a,b)=>Number(a.sort_order||0)-Number(b.sort_order||0));
+  if(sort==='date_desc')out.sort((a,b)=>(b.log_date||'').localeCompare(a.log_date||''));
+  if(sort==='date_asc')out.sort((a,b)=>(a.log_date||'').localeCompare(b.log_date||''));
+  if(sort==='contractor')out.sort((a,b)=>(a.contractor_name||'').localeCompare(b.contractor_name||'','he'));
+  return out
+}
+
+function buildGroups(){const map={};filteredLogs().forEach(l=>{const key=[l.project_number,l.project_name,l.contractor_name,l.month_key].join('||');if(!map[key])map[key]={key,project_number:l.project_number,project_name:l.project_name,contractor:l.contractor_name,month:l.month_key,logs:[]};map[key].logs.push(l)});return Object.values(map).map(g=>{g.logs.sort((a,b)=>(a.log_date||'').localeCompare(b.log_date||''));return g}).sort((a,b)=>Number((a.logs[0]||{}).sort_order||0)-Number((b.logs[0]||{}).sort_order||0))}
+function statusBadge(s){if(s==='מאושר לתשלום')return'ok';if(s==='נדחה / דורש תיקון')return'bad';if(s==='ממתין לאישור')return'warn';return''}
+function locationText(l){return [l.tower?('מגדל '+l.tower):'',l.floor?('קומה '+l.floor):'',l.area||'',l.room||''].filter(Boolean).join(' • ')}
+function renderJournals(){
+  const box=$('journalList'),groups=buildGroups();
+  if(!groups.length){box.innerHTML='<div class="empty">אין יומנים להצגה.<br>פתח יום עבודה חדש או נקה סינון.</div>';return}
+  box.innerHTML=groups.map(g=>{
+    const totals=groupTotals(g.logs);
+    const workerTxt=Object.entries(totals.workerMap).map(([n,c])=>`${escapeHtml(n)}: ${c} ימים`).join(' | ') || 'אין עובדים';
+    const locTxt=totals.locations.map(escapeHtml).join(' | ') || 'אין מיקום';
+    const isOpen=expandedJournals.has(g.key);
+    return `<div class="journal-card ${isOpen?'':'collapsed'}" id="journal-${safeId(g.key)}">
+      <div class="journal-card-head">
+        <div>
+          <div class="journal-title journal-name-click" onclick="toggleJournal('${g.key}')">
+            <span class="journal-toggle">${isOpen?'▼':'◀'}</span>${escapeHtml(g.contractor||'קבלן ללא שם')}
+          </div>
+          <div class="journal-sub">${escapeHtml(g.project_number)} | ${escapeHtml(g.project_name)}<br>יומן חודשי: ${monthName(g.month)}</div>
+          <div class="journal-actions">
+            <button class="btn primary" onclick="addDayToJournal('${g.key}')">+ הוסף יום</button>
+            <button class="btn navy" onclick="printJournalByKey('${g.key}')">הצג / הדפס יומן</button>
+            <button class="btn gold" onclick="exportExcel('${g.key}')">Excel יומן זה</button>
+            <button class="btn danger" onclick="deleteJournalGroup('${g.key}')">מחק יומן</button>
+          </div>
+        </div>
+        <span class="badge">${g.logs.length} ימים</span>
+      </div>
+      <div class="journal-stats">
+        <div><small>הופעות פועלים</small><b>${totals.workers}</b></div>
+        <div><small>שעות</small><b>${totals.hours.toFixed(2)}</b></div>
+        <div><small>לתשלום</small><b>${money(totals.amount)}</b></div>
+        <div><small>מקומות עבודה</small><b>${totals.locations.length}</b></div>
+      </div>
+      <div class="journal-summary">
+        <div class="journal-summary-box"><b>סיכום ימי עבודה לפי פועל:</b><br>${workerTxt}</div>
+        <div class="journal-summary-box"><b>מקומות עבודה ללא כפילות:</b><br>${locTxt}</div>
+      </div>
+      <div class="days-list">${g.logs.map(l=>`<div class="day-item" draggable="true" ondragstart="dragStartLog(event,'${l.id}')" ondragover="allowDrop(event)" ondragleave="clearDrag(event)" ondrop="dropLog(event,'${l.id}')">
+        <div class="day-date"><span class="drag-handle">☰</span>${formatDate(l.log_date)}<br><small>${escapeHtml(l.day_name)}</small></div>
+        <div class="day-text"><b>${escapeHtml(locationText(l)||'ללא מיקום')}</b><br>${escapeHtml((l.done_work||'').slice(0,180))}${(l.done_work||'').length>180?'...':''}<br><span class="badge ${statusBadge(l.status)}">${escapeHtml(l.status)}</span></div>
+        <div class="day-actions"><button class="btn light" onclick="loadToForm('${l.id}')">✏️</button><button class="btn navy" onclick="printLogById('${l.id}')">🖨️</button><button class="btn ok" onclick="approveLogById('${l.id}')">✅</button><button class="btn danger" onclick="deleteLogById('${l.id}')">🗑️</button></div>
+      </div>`).join('')}</div>
+    </div>`
+  }).join('')
+}
+function safeId(s){return String(s).replace(/[^\u0590-\u05FF\w-]+/g,'-')}
+function toggleJournal(key){
+  if(expandedJournals.has(key)) expandedJournals.delete(key); else expandedJournals.add(key);
+  renderAll();
+}
+function renderStats(){const data=filteredLogs(),groups=buildGroups();$('statJournals').textContent=groups.length;$('statLogs').textContent=data.length;$('statWorkers').textContent=data.reduce((s,l)=>s+(l.workers||[]).length,0);$('statAmount').textContent=money(data.reduce((s,l)=>s+Number(l.amount||0),0))}
+function renderAll(){
+  renderJournals();
+  renderStats();
+  $('activeMonthMeta').textContent=monthRangeText();
+}
+
+function formatDate(iso){if(!iso)return'';const [y,m,d]=iso.split('-');return `${d}/${m}/${y}`}
+function dragStartLog(ev,id){draggedLogId=id;ev.dataTransfer.effectAllowed='move'}
+function allowDrop(ev){ev.preventDefault();ev.currentTarget.classList.add('drag-over')}
+function clearDrag(ev){ev.currentTarget.classList.remove('drag-over')}
+async function dropLog(ev,targetId){
+  ev.preventDefault();ev.currentTarget.classList.remove('drag-over');
+  if(!draggedLogId||draggedLogId===targetId)return;
+  const ordered=filteredLogs().map(l=>l.id);
+  const from=ordered.indexOf(draggedLogId),to=ordered.indexOf(targetId);
+  if(from<0||to<0)return;
+  pushUndo('שינוי סדר ידני');
+  ordered.splice(to,0,ordered.splice(from,1)[0]);
+  ordered.forEach((id,i)=>{const l=logs.find(x=>x.id===id);if(l)l.sort_order=i+1});
+  saveLocal();$('sortMode').value='manual';renderAll();toast('הסדר הידני נשמר ✅','ok');
+  if(accessToken){for(const id of ordered){const l=logs.find(x=>x.id===id);if(l)cloudUpsert(l)}}
+}
+
+function printLogById(id){const l=logs.find(x=>x.id===id);if(!l){toast('היומן לא נמצא','bad');return}$('printBody').innerHTML=renderPrintSheet(l);$('printModal').classList.add('active')}
+async function approveLogById(id){
+  const l=logs.find(x=>x.id===id);if(!l){toast('היומן לא נמצא','bad');return}
+  pushUndo('אישור יום לתשלום');
+  l.status='מאושר לתשלום';l.approval_note=l.approval_note||'מאושר לתשלום לפי יומן זה';l.updated_at=new Date().toISOString();saveLocal();
+  if(accessToken)await cloudUpsert(l);renderAll();toast('אושר לתשלום ✅','ok')
+}
+
+function openPrintPreview(){const log=editingId?logs.find(x=>x.id===editingId):formLog();$('printBody').innerHTML=renderPrintSheet(log);$('printModal').classList.add('active')}
+function printSelectedOrBlank(){openPrintPreview()}
+function closePrint(force){if(force===true||force?.target?.id==='printModal')$('printModal').classList.remove('active')}
+
+function printJournalByKey(key){
+  const g=buildGroups().find(x=>x.key===key);
+  if(!g){toast('היומן לא נמצא','bad');return}
+  $('printBody').innerHTML=renderJournalPrintSheet(g);
+  $('printModal').classList.add('active');
+}
+function renderJournalPrintSheet(g){
+  const totals=groupTotals(g.logs);
+  const workerRows=Object.entries(totals.workerMap).map(([name,c],i)=>`<tr><td style="text-align:center">${i+1}</td><td>${escapeHtml(name)}</td><td style="text-align:center">${c}</td></tr>`).join('');
+  const dayRows=g.logs.map((l,i)=>`<tr><td style="text-align:center">${i+1}</td><td style="text-align:center">${formatDate(l.log_date)}</td><td style="text-align:center">${escapeHtml(l.day_name)}</td><td>${escapeHtml(l.contractor_name)}</td><td>${escapeHtml((l.workers||[]).map(w=>w.name).join(', '))}</td><td style="text-align:center">${(l.workers||[]).length}</td><td>${escapeHtml(locationText(l))}</td><td>${escapeHtml(l.done_work)}</td><td>${escapeHtml(l.quantities)}</td><td>${escapeHtml(l.status)}</td><td>${escapeHtml(l.notes)}</td></tr>`).join('');
+  const taskRows=g.logs.flatMap(l=>(l.tasks||[]).map(t=>({l,t}))).map((x,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${formatDate(x.l.log_date)}</td><td>${escapeHtml(x.t.priority)}</td><td>${escapeHtml(x.t.task)}</td><td>${escapeHtml(x.t.status)}</td><td>${escapeHtml(x.t.due)}</td><td>${escapeHtml(x.t.note)}</td></tr>`).join('') || '<tr><td colspan="7">אין משימות סדר יום</td></tr>';
+  return `<div class="print-sheet">
+    <div class="print-header"><img src="assets/logo-mashav-ardan.png" alt="משב-ארדן מערכות"><h1>יומן קבלן חודשי / דף נוכחות</h1><div style="font-weight:900;text-align:left">מס׳ פרויקט: ${escapeHtml(g.project_number)}</div></div>
+    <div class="print-meta">
+      <div><b>שם קבלן:</b><br>${escapeHtml(g.contractor)}</div><div><b>חודש:</b><br>${monthName(g.month)}</div><div><b>פרויקט:</b><br>${escapeHtml(g.project_name)}</div><div><b>ימי עבודה:</b><br>${totals.days}</div>
+      <div><b>סה״כ הופעות פועלים:</b><br>${totals.workers}</div><div><b>שעות מאושרות:</b><br>${totals.hours.toFixed(2)}</div><div><b>סכום סופי משוער:</b><br>${money(totals.amount)}</div><div><b>מקומות עבודה:</b><br>${escapeHtml(totals.locations.join(', '))}</div>
+    </div>
+    <table class="print-table"><thead><tr><th>מס׳</th><th>תאריך</th><th>יום</th><th>שם קבלן/חברה</th><th>עובדים</th><th>כמות</th><th>אזור / מיקום</th><th>פירוט עבודות מסודר</th><th>כמויות / דגשים</th><th>סטטוס</th><th>הערות</th></tr></thead><tbody>${dayRows}</tbody></table>
+    <h3 style="margin-top:18px">סיכום ימי עבודה לפי פועל</h3>
+    <table class="print-table"><thead><tr><th>מס׳</th><th>שם פועל</th><th>מס׳ ימים שהופיע בדיווח</th></tr></thead><tbody>${workerRows}</tbody></table>
+    <h3 style="margin-top:18px">סדר יום / משימות ועדיפויות</h3>
+    <table class="print-table"><thead><tr><th>מס׳</th><th>תאריך</th><th>עדיפות</th><th>משימה</th><th>סטטוס</th><th>יעד</th><th>הערה</th></tr></thead><tbody>${taskRows}</tbody></table>
+    <div class="sign-grid"><div class="sign-box">חתימת הקבלן</div><div class="sign-box">חתימת מנהל עבודה / משב-ארדן</div></div>
+  </div>`
+}
+
+function renderPrintSheet(l){l=normalizeLog(l||formLog());const workerRows=(l.workers&&l.workers.length?l.workers:[{name:'',role:'',present:true}]).map((w,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${escapeHtml(w.name)}</td><td>${escapeHtml(w.role||'')}</td><td style="text-align:center">${w.present!==false?'כן':'לא'}</td></tr>`).join('');const taskRows=(l.tasks&&l.tasks.length?l.tasks:[{priority:'',task:'',status:'',due:'',note:''}]).map((t,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${escapeHtml(t.priority)}</td><td>${escapeHtml(t.task)}</td><td>${escapeHtml(t.status)}</td><td>${escapeHtml(t.due)}</td><td>${escapeHtml(t.note)}</td></tr>`).join('');return `<div class="print-sheet"><div class="print-header"><img src="assets/logo-mashav-ardan.png" alt="משב-ארדן מערכות"><h1>יומן קבלן / דף נוכחות יומי</h1><div style="font-weight:900;text-align:left">מס׳ פרויקט: ${escapeHtml(l.project_number)}</div></div><div class="print-meta"><div><b>תאריך:</b><br>${escapeHtml(formatDate(l.log_date))}</div><div><b>יום:</b><br>${escapeHtml(l.day_name)}</div><div><b>יומן חודש:</b><br>${escapeHtml(monthName(l.month_key))}</div><div><b>שם הקבלן:</b><br>${escapeHtml(l.contractor_name)}</div><div><b>פרויקט:</b><br>${escapeHtml(l.project_name)}</div><div><b>מגדל:</b><br>${escapeHtml(l.tower)}</div><div><b>קומה/אזור:</b><br>${escapeHtml(l.floor)} ${escapeHtml(l.area)}</div><div><b>חדר:</b><br>${escapeHtml(l.room)}</div></div><table class="print-table"><thead><tr><th style="width:40px">מס׳</th><th>שם פועל</th><th>תפקיד</th><th style="width:70px">נוכח</th></tr></thead><tbody>${workerRows}</tbody></table><table class="print-table"><tr><th style="width:160px">מה היה צריך לעשות</th><td>${escapeHtml(l.planned_work).replace(/\n/g,'<br>')}</td></tr><tr><th>מה בוצע בפועל</th><td>${escapeHtml(l.done_work).replace(/\n/g,'<br>')}</td></tr><tr><th>כמויות / דגשים</th><td>${escapeHtml(l.quantities).replace(/\n/g,'<br>')}</td></tr><tr><th>הערות / חריגים</th><td>${escapeHtml(l.notes).replace(/\n/g,'<br>')}</td></tr></table><table class="print-table"><thead><tr><th>מס׳</th><th>עדיפות</th><th>משימה</th><th>סטטוס</th><th>יעד</th><th>הערה</th></tr></thead><tbody>${taskRows}</tbody></table><div class="print-meta"><div><b>שעות מאושרות:</b><br>${Number(l.approved_hours||0).toFixed(2)}</div><div><b>סוג תשלום:</b><br>${escapeHtml(l.payment_type)}</div><div><b>תעריף:</b><br>${money(l.rate)}</div><div><b>סה״כ משוער:</b><br>${money(l.amount)}</div></div><table class="print-table"><tr><th style="width:160px">מאשר מטעמנו</th><td>${escapeHtml(l.supervisor_name)} | ${escapeHtml(l.supervisor_role)}</td></tr><tr><th>הערת אישור</th><td>${escapeHtml(l.approval_note)}</td></tr></table><div class="sign-grid"><div class="sign-box">חתימת הקבלן</div><div class="sign-box">חתימת מנהל עבודה / משב-ארדן</div></div></div>`}
+
+function logsForAllContractors(){
+  const pf=$('projectFilter').value, q=$('searchInput').value.trim().toLowerCase();
+  return logs.filter(l=>{
+    if(pf!=='all'&&l.project_number!==pf) return false;
+    if(!monthInRange(l.month_key)) return false;
+    if(q){
+      const blob=[l.project_number,l.project_name,l.contractor_name,l.contractor_manager,l.tower,l.floor,l.area,l.room,l.planned_work,l.done_work,l.quantities,l.notes,l.next_tasks,(l.workers||[]).map(w=>w.name).join(' '),(l.tasks||[]).map(t=>t.task).join(' ')].join(' ').toLowerCase();
+      if(!blob.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>(a.contractor_name||'').localeCompare(b.contractor_name||'','he') || (a.log_date||'').localeCompare(b.log_date||''));
+}
+
+async function exportAllContractors(){
+  await exportExcel(null, logsForAllContractors(), true);
+}
+
+async function exportExcel(groupKey=null,overrideData=null,allContractors=false){let data=overrideData|| (groupKey?(buildGroups().find(g=>g.key===groupKey)?.logs||[]):filteredLogs());if(!data.length){toast('אין נתונים לייצוא','warn');return}if(!window.ExcelJS){toast('ספריית Excel לא נטענה','bad');return}const wb=new ExcelJS.Workbook();wb.creator='משב-ארדן מערכות';wb.created=new Date();const ws=wb.addWorksheet('יומן עבודה',{views:[{rightToLeft:true,showGridLines:false,state:'frozen',ySplit:4}]});ws.pageSetup={paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.25,right:0.25,top:0.35,bottom:0.35,header:0.1,footer:0.1}};ws.columns=[{key:'date',width:13},{key:'day',width:11},{key:'contractor',width:20},{key:'workers',width:34},{key:'count',width:13},{key:'area',width:30},{key:'details',width:58},{key:'quantities',width:42},{key:'status',width:18},{key:'notes',width:32}];ws.mergeCells('A1:B3');if(LOGO_DATA_URI){try{const imgId=wb.addImage({base64:LOGO_DATA_URI,extension:'png'});ws.addImage(imgId,{tl:{col:0.1,row:0.1},ext:{width:250,height:75}})}catch(e){}}const titleMonth=data.length&&data.every(l=>l.month_key===data[0].month_key)?monthName(data[0].month_key):'כל החודשים';ws.mergeCells('C1:J1');ws.getCell('C1').value=(allContractors?'יומן עבודה קבלנים – כל הקבלנים – ':'יומן עבודה קבלנים – ')+titleMonth;ws.getCell('C1').font={bold:true,size:22,color:{argb:'FF0F2747'}};ws.getCell('C1').alignment={horizontal:'center',vertical:'middle'};ws.mergeCells('C2:J2');ws.getCell('C2').value='משב ארדן | מסודר לפי תאריך, עובדים, כמות פועלים, אזורים, עבודות וכמויות';ws.getCell('C2').font={bold:true,size:12,color:{argb:'FF2454D6'}};ws.getCell('C2').alignment={horizontal:'center'};ws.getRow(4).values=['תאריך','יום','שם קבלן/חברה','עובדים','כמות פועלים','אזור / מיקום','פירוט עבודות מסודר','כמויות / דגשים','סטטוס','הערות'];styleHeader(ws.getRow(4));data.sort((a,b)=>(a.log_date||'').localeCompare(b.log_date||'')).forEach(l=>ws.addRow([formatDate(l.log_date),l.day_name||getDayName(l.log_date),l.contractor_name,(l.workers||[]).map(w=>w.name).join(', '),(l.workers||[]).length,locationText(l),l.done_work,l.quantities,l.status,l.notes]));for(let r=5;r<=ws.rowCount;r++){const row=ws.getRow(r);row.height=70;row.eachCell(c=>{c.alignment={horizontal:'right',vertical:'top',wrapText:true};c.border=thinBorder()});['A','B','E','I'].forEach(col=>ws.getCell(`${col}${r}`).alignment={horizontal:'center',vertical:'middle',wrapText:true});if(ws.getCell(`I${r}`).value==='מאושר לתשלום'){ws.getCell(`I${r}`).fill=fill('DCFCE7');ws.getCell(`I${r}`).font={bold:true,color:{argb:'FF166534'}}}}ws.autoFilter={from:'A4',to:'J4'};buildSummarySheet(wb,data,titleMonth);buildTasksSheet(wb,data);buildDictionarySheet(wb);const buffer=await wb.xlsx.writeBuffer();const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='יומן_עבודה_קבלנים_משב_ארדן.xlsx';a.click();URL.revokeObjectURL(a.href);toast('קובץ Excel דומה לתבנית ירד למחשב ✅','ok')}
+function styleHeader(row){row.height=24;row.eachCell(c=>{c.fill=fill('2454D6');c.font={bold:true,color:{argb:'FFFFFFFF'},size:11};c.alignment={horizontal:'center',vertical:'middle'};c.border=thinBorder()})}
+function fill(hex){return{type:'pattern',pattern:'solid',fgColor:{argb:'FF'+hex}}}
+function thinBorder(){return{top:{style:'thin',color:{argb:'FF8BA7C9'}},left:{style:'thin',color:{argb:'FF8BA7C9'}},bottom:{style:'thin',color:{argb:'FF8BA7C9'}},right:{style:'thin',color:{argb:'FF8BA7C9'}}}}
+function buildSummarySheet(wb,data,titleMonth){const ws=wb.addWorksheet('סיכום',{views:[{rightToLeft:true,showGridLines:false}]});ws.columns=[{width:28},{width:18},{width:8},{width:24},{width:22},{width:18}];ws.getCell('A1').value='משב ארדן\nMASHAV ARDAN';ws.getCell('A1').font={bold:true,size:14,color:{argb:'FF2454D6'}};ws.getCell('A1').alignment={horizontal:'center',vertical:'middle',wrapText:true};ws.mergeCells('C1:F1');ws.getCell('C1').value='סיכום יומן עבודה – '+titleMonth;ws.getCell('C1').font={bold:true,size:20,color:{argb:'FF0F2747'}};ws.getCell('C1').alignment={horizontal:'center'};ws.mergeCells('C2:F2');ws.getCell('C2').value='סיכום ימים, כמות פועלים וימי הופעה לפי עובד';ws.getCell('C2').font={bold:true,size:12,color:{argb:'FF2454D6'}};ws.getRow(4).values=['מדד','ערך','','עובד','מס׳ ימים שהופיע בדיווח','אחוז מימי הדיווח'];styleHeader(ws.getRow(4));const dates=data.map(l=>l.log_date).sort(),workerMap={};data.forEach(l=>(l.workers||[]).forEach(w=>{workerMap[w.name]=(workerMap[w.name]||0)+1}));const metrics=[['ימי עבודה מדווחים',data.length],['תאריך ראשון',formatDate(dates[0]||'')],['תאריך אחרון',formatDate(dates[dates.length-1]||'')],['סה״כ הופעות פועלים',data.reduce((s,l)=>s+(l.workers||[]).length,0)],['ממוצע פועלים ליום',data.length?(data.reduce((s,l)=>s+(l.workers||[]).length,0)/data.length).toFixed(2):0]];metrics.forEach((m,i)=>{ws.getRow(5+i).getCell(1).value=m[0];ws.getRow(5+i).getCell(2).value=m[1]});Object.entries(workerMap).sort((a,b)=>b[1]-a[1]).forEach(([name,c],i)=>{ws.getRow(5+i).getCell(4).value=name;ws.getRow(5+i).getCell(5).value=c;ws.getRow(5+i).getCell(6).value=data.length?c/data.length:0;ws.getRow(5+i).getCell(6).numFmt='0%'});ws.eachRow(row=>row.eachCell(c=>{c.border=thinBorder();c.alignment={horizontal:'center',vertical:'middle',wrapText:true}}))}
+function buildTasksSheet(wb,data){const ws=wb.addWorksheet('סדר יום',{views:[{rightToLeft:true,showGridLines:false,state:'frozen',ySplit:3}]});ws.columns=[{width:13},{width:16},{width:18},{width:12},{width:45},{width:14},{width:14},{width:32}];ws.mergeCells('A1:H1');ws.getCell('A1').value='סדר יום לקבלנים – משימות ועדיפויות';ws.getCell('A1').font={bold:true,size:20,color:{argb:'FF0F2747'}};ws.getCell('A1').alignment={horizontal:'center'};ws.getRow(3).values=['תאריך','קבלן','מיקום','עדיפות','משימה','סטטוס','תאריך יעד','הערה'];styleHeader(ws.getRow(3));let r=4;data.forEach(l=>(l.tasks||[]).forEach(t=>{ws.getRow(r).values=[formatDate(l.log_date),l.contractor_name,locationText(l),t.priority,t.task,t.status,t.due,t.note];r++}));if(r===4){ws.getRow(4).values=['','','','גבוהה','כאן יופיעו משימות מסדר היום שהוזנו באתר','','','']};for(let i=4;i<=Math.max(4,ws.rowCount);i++){ws.getRow(i).height=34;ws.getRow(i).eachCell(c=>{c.border=thinBorder();c.alignment={horizontal:'right',vertical:'middle',wrapText:true}})}}
+function buildDictionarySheet(wb){const ws=wb.addWorksheet('מפתח תרגום',{views:[{rightToLeft:true,showGridLines:false}]});ws.columns=[{width:24},{width:24},{width:24},{width:34}];ws.mergeCells('A1:D1');ws.getCell('A1').value='מפתח תרגום / מונחים';ws.getCell('A1').font={bold:true,size:18,color:{argb:'FF0F2747'}};ws.getCell('A1').alignment={horizontal:'center'};ws.getRow(3).values=['עברית','ערבית/שטח','אנגלית','הערה'];styleHeader(ws.getRow(3));[['נברשת','تريا / تريات','Chandelier','תיקון מונח לפי שיחה'],['השחלה','سحب','Pulling cable',''],['חיווט','تجميع','Wiring',''],['שנאי/דרייבר','محول','Driver/Transformer',''],['מפוח','المبوح','Fan/Blower',''],['פתח שירות','بيتح شيروت','Service hatch','']].forEach(x=>ws.addRow(x));ws.eachRow(row=>row.eachCell(c=>{c.border=thinBorder();c.alignment={horizontal:'center',vertical:'middle',wrapText:true}}))}
+function openAIModal(){$('aiModal').classList.add('active')}
+function closeAIModal(force){if(force===true||force?.target?.id==='aiModal')$('aiModal').classList.remove('active')}
+function askAI(){const data=filteredLogs(),groups=buildGroups(),pending=data.filter(l=>l.status!=='מאושר לתשלום'),approved=data.filter(l=>l.status==='מאושר לתשלום'),tasks=[];data.forEach(l=>(l.tasks||[]).forEach(t=>tasks.push({...t,contractor:l.contractor_name,date:l.log_date})));const high=tasks.filter(t=>t.priority==='גבוהה'||t.status==='דחוף');$('aiAnswer').innerHTML=`<b>סיכום לפי הסינון הנוכחי:</b><br>• יומנים חודשיים: ${groups.length}<br>• ימי עבודה: ${data.length}<br>• מאושר לתשלום: ${approved.length}<br>• ממתין/טיוטה/דורש תיקון: ${pending.length}<br>• הופעות פועלים: ${data.reduce((s,l)=>s+(l.workers||[]).length,0)}<br>• סכום משוער: ${money(data.reduce((s,l)=>s+Number(l.amount||0),0))}<br><br><b>משימות דחופות/גבוהות:</b><br>${high.slice(0,10).map(t=>`• ${escapeHtml(t.contractor)} — ${escapeHtml(t.task)} (${escapeHtml(t.priority)})`).join('<br>')||'אין משימות דחופות כרגע'}`}
+setInterval(()=>{$('clock').textContent=new Date().toLocaleString('he-IL',{dateStyle:'short',timeStyle:'medium'})},1000);
+checkAuth();
+</script>
+</body>
+</html>
